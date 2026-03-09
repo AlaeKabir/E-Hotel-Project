@@ -1,47 +1,39 @@
-import './App.css';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-
-import Navbar from "./components/Navbar";
-
-
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import NavigationBar from './components/Navbar';
+import Footer from './components/Footer';
+import Home from "./pages/Home";
 import SearchRooms from "./pages/SearchRooms";
-import BookingPage from "./pages/BookingPage";
-import MyBookings from "./pages/MyBookings";
-import EmployeeDashboard from "./pages/EmployeeDashboard";
-import ConvertBooking from "./pages/ConvertBooking";
-import DirectRenting from "./pages/DirectRenting";
-import Payments from "./pages/Payments";
-import ManageCustomers from "./pages/ManageCustomers";
-import ManageEmployees from "./pages/ManageEmployees";
-import ManageHotels from "./pages/ManageHotels";
-import ManageRooms from "./pages/ManageRooms";
-import RoomsPerAreaView from "./pages/RoomsPerAreaView";
-import HotelCapacityView from "./pages/HotelCapacityView";
-
+import Booking from "./pages/Booking";
+import Renting from "./pages/Renting";
+import Customers from "./pages/Customers";
+import Employees from "./pages/Employees";
+import Hotels from "./pages/Hotels";
+import Rooms from "./pages/Rooms";
+import Views from "./pages/Views";
+import './App.css';
 
 function App() {
-return (
-<Router>
-<Navbar />
-<Routes>
-<Route path="/" element={<SearchRooms />} />
-<Route path="/booking" element={<BookingPage />} />
-<Route path="/my-bookings" element={<MyBookings />} />
-<Route path="/employee" element={<EmployeeDashboard />} />
-<Route path="/convert-booking" element={<ConvertBooking />} />
-<Route path="/direct-renting" element={<DirectRenting />} />
-<Route path="/payments" element={<Payments />} />
-<Route path="/manage-customers" element={<ManageCustomers />} />
-<Route path="/manage-employees" element={<ManageEmployees />} />
-<Route path="/manage-hotels" element={<ManageHotels />} />
-<Route path="/manage-rooms" element={<ManageRooms />} />
-<Route path="/rooms-per-area" element={<RoomsPerAreaView />} />
-<Route path="/hotel-capacity" element={<HotelCapacityView />} />
-</Routes>
-</Router>
-);
+  return (
+    <Router>
+      <div className="wrapper">
+        <NavigationBar />
+        <div>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/search" element={<SearchRooms />} />
+            <Route path="/booking" element={<Booking />} />
+            <Route path="/renting" element={<Renting />} />
+            <Route path="/customers" element={<Customers />} />
+            <Route path="/employees" element={<Employees />} />
+            <Route path="/hotels" element={<Hotels />} />
+            <Route path="/rooms" element={<Rooms />} />
+            <Route path="/views" element={<Views />} />
+          </Routes>
+        </div>
+        <Footer />
+      </div>
+    </Router>
+  );
 }
-
 
 export default App;

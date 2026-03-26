@@ -1,5 +1,4 @@
 //RANDOM EXAMPLE I STOLE FROM CLAUDE TO USE AS REFERENCE
-
 // src/main/java/com/example/UserServlet.java
 @WebServlet("/users")
 public class UserServlet extends HttpServlet {

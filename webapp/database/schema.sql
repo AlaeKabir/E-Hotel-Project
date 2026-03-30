@@ -223,7 +223,7 @@ EXECUTE FUNCTION limit_email_per_hotel();
 CREATE TABLE Manages (
     hotel_id INTEGER PRIMARY KEY,
 
-    employee_ssn INTEGER NOT NULL UNIQUE,
+    employee_ssn INTEGER NOT NULL UNIQUE CHECK (employee_ssn ~ '^[0-9]{9}$'),
 
     FOREIGN KEY (hotel_id)
         REFERENCES hotel(hotel_id)
@@ -234,7 +234,7 @@ CREATE TABLE Manages (
 );
 
 CREATE TABLE employee (
-    employee_ssn INTEGER PRIMARY KEY,
+    employee_ssn INTEGER PRIMARY KEY  CHECK (employee_ssn ~ '^[0-9]{9}$'),
     hotel_id INTEGER NOT NULL,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
@@ -250,25 +250,25 @@ CREATE TABLE employee (
 );
 
 CREATE TABLE employee_position (
-    employee_ssn integer NOT NULL
-        CHECK (employee_ssn ~ '^[0-9]{9}$'),
+    employee_ssn varchar(20) NOT NULL
+        CHECK (employee_ssn ~ '^[a-zA-Z0-9]{8-15}$'),
 
     hotel_id INTEGER NOT NULL,
 
     position VARCHAR(30) NOT NULL
         CHECK (
             position IN (
-                'doorman',
-                'concierge',
-                'valet',
-                'security',
-                'front desk agent',
-                'housekeeper',
-                'maintenance',
-                'cleaner',
-                'server',
-                'bartender',
-                'chef'
+                'Doorman',
+                'Concierge',
+                'Valet',
+                'Security',
+                'Front desk agent',
+                'Housekeeper',
+                'Maintenance',
+                'Cleaner',
+                'Server',
+                'Bartender',
+                'Chef'
             )
         ),
 
@@ -282,3 +282,96 @@ CREATE TABLE employee_position (
         REFERENCES employee(employee_ssn)
         ON DELETE CASCADE
 );
+
+CREATE TABLE Room (
+    hotel_id integer NOT NULL,
+    room_number integer NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    capacity integer NOT NULL,
+    view_type VARCHAR(20),
+    extendable BOOLEAN NOT NULL,
+    damages BOOLEAN NOT NULL,
+
+    PRIMARY KEY (hotel_id, room_number),
+
+    FOREIGN KEY (hotel_id) REFERENCES Hotel(hotel_id),
+
+    CHECK (price > 0),
+    CHECK (capacity > 0),
+    CHECK (view_type IN ('Sea', 'Mountain')),
+
+    CHECK (NOT (capacity = 1 AND extendable = TRUE))
+);
+
+create table amenity (
+    hotel_id integer not null,
+    room_number integer not null,
+    amenity varchar(20),
+
+    primary key(hotel_id, room_number, amentiy),
+    FOREIGN KEY (hotel_id, room_number)
+        REFERENCES Room(hotel_id, room_number),
+    
+    CHECK (amenity IN ('TV', 'AC', 'WiFi', 'Fridge', 'Microwave', 'Iron'))
+);
+
+create table customer (
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    street_number integer not null check( street_number>0),
+    street_name  varchar(50) not null,
+    city varchar(50) not null,
+    province varchar(50) not null,
+    zip varchar(6) not null  CHECK (zip ~ '^[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9]$'),
+    customer_id varchar(20) primary key,
+    registration_date date not null check(registration_date <= CURRENT_DATE)
+);
+
+create table renting_booking (
+    hotel_id integer not null,
+    room_number integer not null,
+    customer_id varchar(20) not null,
+    renting_booking_id integer not null,
+    checkin_date date not null,
+    employee_responsable varchar(20) not null,
+    booking boolean not null,
+    booking_date date,
+    PRIMARY KEY (renting_id),
+    FOREIGN KEY (hotel_id, room_number)
+        REFERENCES Room(hotel_id, room_number),
+    FOREIGN KEY (customer_id)
+        REFERENCES Customer(customer_id),
+    FOREIGN KEY (employee_responsable)
+        REFERENCES Employee(employee_ssn),
+    Check (checkin_date < checkout_date),
+    CHECK(checkin_date >= CURRENT_DATE)
+    CHECK (
+    (booking = TRUE AND booking_date IS NOT NULL)
+    OR (booking = FALSE))
+;)
+
+CREATE OR REPLACE FUNCTION check_renting_overlap()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM Renting r
+        WHERE r.hotel_id = NEW.hotel_id
+          AND r.room_number = NEW.room_number
+          AND r.renting_id <> NEW.renting_id
+          AND NEW.checkin_date < r.checkout_date
+          AND NEW.checkout_date > r.checkin_date
+    ) THEN
+        RAISE EXCEPTION 'This room already has a renting during the selected date range.';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_check_renting_overlap
+BEFORE INSERT OR UPDATE
+ON Renting
+FOR EACH ROW
+EXECUTE FUNCTION check_renting_overlap();
+

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS hotel_chain(
 
 
 create table if not exists hotel_chain_contact_phone(
-    hotel_chain_phone integer primary key CHECK (hotel_chain_phone ~ '^[0-9]{10,11}$'),
+    hotel_chain_phone integer primary key CHECK (hotel_chain_phone between 10000000000 and 99999999999),
     hotel_chain_id integer not null,
     foreign key (hotel_chain_id) 
         references hotel_chain(hotel_chain_id) on delete cascade
@@ -44,7 +44,7 @@ create table if not exists hotel_chain_contact_email(
     hotel_chain_id integer not null,
     foreign key (hotel_chain_id) 
         references hotel_chain(hotel_chain_id) on delete cascade,
-        CONSTRAINT CHK_Email_Charindex CHECK (CHARINDEX('@', Email) > 0)
+    CONSTRAINT CHK_Email_Charindex CHECK (CHARINDEX('@', Email) > 0)
 );
 
 
@@ -84,7 +84,7 @@ create table if not exists hotel(
 
 
 create table if not exists hotel_contact_phone(
-    hotel_phone integer primary key CHECK (hotel_phone ~ '^[0-9]{10,11}$'),
+    hotel_phone integer primary key CHECK (hotel_phone between 10000000000 and 99999999999),
     hotel_id integer not null,
     foreign key (hotel_id) 
         references hotel(hotel_id) on delete cascade
@@ -118,8 +118,8 @@ create table if not exists hotel_contact_email(
     hotel_id integer not null,
     foreign key (hotel_id) 
         references hotel(hotel_id) on delete cascade,
-        CONSTRAINT CHK_Email_Charindex CHECK (CHARINDEX('@', Email) > 0);
-)
+        CONSTRAINT CHK_Email_Charindex CHECK (CHARINDEX('@', Email) > 0)
+);
 
 
 CREATE OR REPLACE FUNCTION limit_email_per_hotel()
@@ -145,7 +145,7 @@ EXECUTE FUNCTION limit_email_per_hotel();
 CREATE TABLE Manages (
     hotel_id INTEGER PRIMARY KEY,
 
-    employee_ssn INTEGER NOT NULL UNIQUE CHECK (employee_ssn ~ '^[0-9]{9}$'),
+    employee_ssn INTEGER NOT NULL UNIQUE CHECK (employee_ssn between 100000000 and 999999999),
 
     FOREIGN KEY (hotel_id)
         REFERENCES hotel(hotel_id)
@@ -156,7 +156,7 @@ CREATE TABLE Manages (
 );
 
 CREATE TABLE if not exists employee (
-    employee_ssn INTEGER PRIMARY KEY  CHECK (employee_ssn ~ '^[0-9]{9}$'),
+    employee_ssn INTEGER PRIMARY KEY  CHECK (employee_ssn between 100000000 and 999999999),
     hotel_id INTEGER NOT NULL,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
@@ -173,7 +173,7 @@ CREATE TABLE if not exists employee (
 
 CREATE TABLE if not exists employee_position (
     employee_ssn varchar(20) NOT NULL
-        CHECK (employee_ssn ~ '^[a-zA-Z0-9]{8-15}$'),
+        CHECK (employee_ssn between 100000000 and 999999999),
 
     hotel_id INTEGER NOT NULL,
 
@@ -266,11 +266,11 @@ create table if not exists renting_booking (
     FOREIGN KEY (employee_responsable)
         REFERENCES Employee(employee_ssn),
     Check (checkin_date < checkout_date),
-    CHECK(checkin_date >= CURRENT_DATE)
+    CHECK(checkin_date >= CURRENT_DATE),
     CHECK (
     (booking = TRUE AND booking_date IS NOT NULL)
     OR (booking = FALSE))
-;)
+);
 
 CREATE OR REPLACE FUNCTION check_renting_overlap()
 RETURNS TRIGGER AS $$

@@ -58,7 +58,7 @@ FOR EACH ROW
 EXECUTE FUNCTION limit_phone_per_chain();
 
 create table if not exists hotel_chain_contact_email(
-    hotel_chain_email varchar(50) primary key check(),
+    hotel_chain_email varchar(50) primary key,
     hotel_chain_id integer not null,
     foreign key (hotel_chain_id) 
         references hotel_chain(hotel_chain_id) on delete cascade,

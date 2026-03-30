@@ -297,3 +297,16 @@ ON Renting
 FOR EACH ROW
 EXECUTE FUNCTION check_renting_overlap();
 
+create table if not exists archived_renting_booking (
+    hotel_id integer not null,
+    archived_renting_booking id integer primary key,
+    room_number integer not null,
+    checkin_date date not null,
+    checkout_date date not null,
+    booking_date date,
+    booking boolean not null,
+    check(checkin_date < checkout_date),
+    CHECK (
+    (booking = TRUE AND booking_date IS NOT NULL)
+    OR (booking = FALSE))
+);

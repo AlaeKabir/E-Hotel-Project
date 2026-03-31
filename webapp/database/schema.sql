@@ -44,7 +44,8 @@ create table if not exists hotel_chain_contact_email(
     hotel_chain_id integer not null,
     foreign key (hotel_chain_id) 
         references hotel_chain(hotel_chain_id) on delete cascade,
-    CONSTRAINT CHK_Email_Charindex CHECK (CHARINDEX('@', Email) > 0)
+    CONSTRAINT chk_email_at
+        CHECK (hotel_chain_email ~ '^[^@]+@[^@]+\.[^@]+$')
 );
 
 
@@ -255,10 +256,11 @@ create table if not exists renting_booking (
     customer_id varchar(20) not null,
     renting_booking_id integer not null,
     checkin_date date not null,
+    checkout_date date not null,
     employee_responsable varchar(20) not null,
     booking boolean not null,
     booking_date date,
-    PRIMARY KEY (renting_id),
+    PRIMARY KEY (renting_booking_id),
     FOREIGN KEY (hotel_id, room_number)
         REFERENCES Room(hotel_id, room_number),
     FOREIGN KEY (customer_id)
@@ -266,11 +268,37 @@ create table if not exists renting_booking (
     FOREIGN KEY (employee_responsable)
         REFERENCES Employee(employee_ssn),
     Check (checkin_date < checkout_date),
-    CHECK(checkin_date >= CURRENT_DATE),
     CHECK (
     (booking = TRUE AND booking_date IS NOT NULL)
-    OR (booking = FALSE))
+    OR (booking = FALSE)),
+    UNIQUE (
+        hotel_id,
+        room_number,
+        customer_id,
+        checkin_date,
+        checkout_date,
+        employee_responsable,
+        booking,
+        booking_date
+    )
 );
+
+CREATE OR REPLACE FUNCTION check_checkin_not_past()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.checkin_date < CURRENT_DATE THEN
+        RAISE EXCEPTION 'checkin_date (%) cannot be before today (%)',
+            NEW.checkin_date, CURRENT_DATE;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_check_checkin_not_past
+BEFORE INSERT OR UPDATE ON renting_booking
+FOR EACH ROW
+EXECUTE FUNCTION check_checkin_not_past();
 
 CREATE OR REPLACE FUNCTION check_renting_overlap()
 RETURNS TRIGGER AS $$
@@ -299,7 +327,7 @@ EXECUTE FUNCTION check_renting_overlap();
 
 create table if not exists archived_renting_booking (
     hotel_id integer not null,
-    archived_renting_booking id integer primary key,
+    archived_renting_booking_id integer primary key,
     room_number integer not null,
     checkin_date date not null,
     checkout_date date not null,
@@ -308,5 +336,16 @@ create table if not exists archived_renting_booking (
     check(checkin_date < checkout_date),
     CHECK (
     (booking = TRUE AND booking_date IS NOT NULL)
-    OR (booking = FALSE))
+    OR (booking = FALSE)),
+      UNIQUE (
+        hotel_id,
+        room_number,
+        customer_id,
+        checkin_date,
+        checkout_date,
+        employee_responsable,
+        booking,
+        booking_date
+    )
 );
+

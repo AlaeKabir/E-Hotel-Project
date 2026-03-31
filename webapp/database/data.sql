@@ -85,3 +85,181 @@ insert into hotel_contact_phone(hotel_phone, hotel_id)
 insert into hotel_contact_email(hotel_email, hotel_id)
     values('contact@starringhotel.com', 1), ('info@starringhotel.com', 1), ('hello@starzhotel.com', 2), ('contact@etoilehotel.com', 3), ('info@etoilehotel.com', 3), ('stay@starryhotel.com', 4), ('hello@starryhotel.com', 4), ('contact@starshothotel.com', 5), ('info@starshothotel.com', 5), ('reservations@starshothotel.com', 5), ('stay@starshothotel.com', 5), ('hello@starshothotel.com', 5), ('contact@pictonstarhotel.com', 6), ('info@stargazershotel.com', 7), ('reservations@stargazershotel.com', 7), ('contact@stardomehotel.com', 8), ('info@stardomehotel.com', 8), ('reservations@stardomehotel.com', 8), ('contact@jamieshotel.com', 9), ('info@jamieshotel.com', 9), ('contact@jamjamhotel.com', 10), ('info@jamjamhotel.com', 10), ('reservations@jamjamhotel.com', 10), ('contact@jamiehousinghotel.com', 11), ('contact@jamiehousesyoudowntown.com', 12), ('info@jamiehousesyoudowntown.com', 12), ('contact@jamiehousesyousuites.com', 13), ('info@jamiehousesyousuites.com', 13), ('reservations@jamiehousesyousuites.com', 13), ('contact@jamiehousesyouinn.com', 14), ('contact@jamiehousesyouplaza.com', 15), ('info@jamiehousesyouplaza.com', 15), ('contact@jamiehousesyoucomfort.com', 16), ('info@jamiehousesyoucomfort.com', 16), ('reservations@jamiehousesyoucomfort.com', 16), ('contact@jamiehousesyougrand.com', 17), ('contact@edmontonbestsuites.com', 18), ('info@edmontonbestsuites.com', 18), ('reservations@edmontonbestsuites.com', 18), ('stay@edmontonbestsuites.com', 18), ('hello@edmontonbestsuites.com', 18), ('contact@edmontonbestinn.com', 19), ('info@edmontonbestinn.com', 19), ('contact@edmontonbestwaterfront.com', 20), ('info@edmontonbestwaterfront.com', 20), ('reservations@edmontonbestwaterfront.com', 20), ('contact@edmontonbestretreat.com', 21), ('contact@edmontonbestlodge.com', 22), ('info@edmontonbestlodge.com', 22), ('contact@edmontonbestplaza.com', 23), ('info@edmontonbestplaza.com', 23), ('reservations@edmontonbestplaza.com', 23), ('contact@edmontonbestdowntown.com', 24), ('contact@edmontonbestharbour.com', 25), ('info@edmontonbestharbour.com', 25), ('contact@chateauroyale.com', 26), ('info@chateauroyale.com', 26), ('reservations@chateauroyale.com', 26), ('contact@chateaugrand.com', 27), ('contact@chateauwaterfront.com', 28), ('info@chateauwaterfront.com', 28), ('contact@chateauheights.com', 29), ('info@chateauheights.com', 29), ('reservations@chateauheights.com', 29), ('contact@chateaumeadow.com', 30), ('contact@chateauocean.com', 31), ('info@chateauocean.com', 31), ('contact@chateaucanyon.com', 32), ('info@chateaucanyon.com', 32), ('reservations@chateaucanyon.com', 32), ('contact@chateaupark.com', 33), ('contact@chateauriverstone.com', 34), ('info@chateauriverstone.com', 34), ('contact@chateaugolden.com', 35), ('info@chateaugolden.com', 35), ('reservations@chateaugolden.com', 35), ('contact@alexandersuites.com', 36), ('contact@alexandergrand.com', 37), ('info@alexandergrand.com', 37), ('contact@alexanderharbour.com', 38), ('info@alexanderharbour.com', 38), ('reservations@alexanderharbour.com', 38), ('contact@alexanderretreat.com', 39), ('contact@alexanderplaza.com', 40), ('info@alexanderplaza.com', 40), ('contact@alexanderlakeside.com', 41), ('info@alexanderlakeside.com', 41), ('reservations@alexanderlakeside.com', 41), ('contact@alexanderheights.com', 42), ('contact@alexandercrescent.com', 43), ('info@alexandercrescent.com', 43);
 
+
+--quick way to randomize data and add lots of rooms
+INSERT INTO Room (hotel_id, room_number, price, capacity, view_type, extendable, damages)
+    SELECT
+        h.hotel_id,
+        gs.room_number,
+        
+        -- price
+        (
+            75
+            + (h.star_rating * 20)
+            + (gs.room_number * 15)
+            + ((h.hotel_id % 5) * 7)
+        )::DECIMAL(10,2) AS price,
+
+        -- capacity
+        CASE
+            WHEN gs.room_number % 5 = 1 THEN 1
+            WHEN gs.room_number % 5 = 2 THEN 2
+            WHEN gs.room_number % 5 = 3 THEN 3
+            WHEN gs.room_number % 5 = 4 THEN 4
+            ELSE 5
+        END AS capacity,
+
+        -- view_type
+        CASE
+            WHEN (h.hotel_id + gs.room_number) % 2 = 0 THEN 'Sea'
+            ELSE 'Mountain'
+        END AS view_type,
+
+        -- extendable
+        CASE
+            WHEN
+                CASE
+                    WHEN gs.room_number % 5 = 1 THEN 1
+                    WHEN gs.room_number % 5 = 2 THEN 2
+                    WHEN gs.room_number % 5 = 3 THEN 3
+                    WHEN gs.room_number % 5 = 4 THEN 4
+                    ELSE 5
+                END = 1
+            THEN FALSE
+            ELSE ((h.hotel_id + gs.room_number) % 2 = 0)
+        END AS extendable,
+
+        -- damages
+        ((h.hotel_id * gs.room_number) % 4 = 0) AS damages
+
+    FROM Hotel h
+    CROSS JOIN LATERAL generate_series(1, h.num_of_rooms) AS gs(room_number)
+    ORDER BY h.hotel_id, gs.room_number;
+
+-- quick way to randomize amenity data 
+INSERT INTO amenity (hotel_id, room_number, amenity)
+
+    SELECT
+        r.hotel_id,
+        r.room_number,
+        a.amenity
+    FROM Room r
+    CROSS JOIN (
+        VALUES 
+            ('TV'),
+            ('AC'),
+            ('WiFi'),
+            ('Fridge'),
+            ('Microwave'),
+            ('Iron')
+    ) AS a(amenity)
+    WHERE random() < 0.7;  -- 70% chance each amenity is included
+
+-- only 3 employees for first 10 hotels
+INSERT INTO employee (
+        employee_ssn, hotel_id, first_name, last_name,
+        street_number, street_name, city, province, zip
+    )
+    VALUES
+    -- Hotel 1
+    (100000001,1,'John','Smith',10,'Maple Street','Kingston','Ontario','K1A1A1'),
+    (100000002,1,'Emma','Brown',22,'Oak Avenue','Kingston','Ontario','K1A1A2'),
+    (100000003,1,'Liam','Davis',35,'Pine Road','Kingston','Ontario','K1A1A3'),
+
+    -- Hotel 2
+    (100000004,2,'Noah','Wilson',12,'Birch Street','Ottawa','Ontario','K1B1B1'),
+    (100000005,2,'Olivia','Taylor',44,'Cedar Avenue','Ottawa','Ontario','K1B1B2'),
+    (100000006,2,'Ava','Anderson',78,'Elm Street','Ottawa','Ontario','K1B1B3'),
+
+    -- Hotel 3
+    (100000007,3,'Sophia','Thomas',9,'Willow Road','Montreal','Quebec','H1A1A1'),
+    (100000008,3,'Mason','Jackson',18,'Ash Street','Montreal','Quebec','H1A1A2'),
+    (100000009,3,'Isabella','White',50,'Spruce Ave','Montreal','Quebec','H1A1A3'),
+
+    -- Hotel 4
+    (100000010,4,'James','Harris',33,'Lake Street','Quebec City','Quebec','G1A1A1'),
+    (100000011,4,'Mia','Martin',21,'Hill Road','Quebec City','Quebec','G1A1A2'),
+    (100000012,4,'Lucas','Thompson',64,'Forest Ave','Quebec City','Quebec','G1A1A3'),
+
+    -- Hotel 5
+    (100000013,5,'Amelia','Garcia',11,'River Road','Brock','Ontario','L1A1A1'),
+    (100000014,5,'Ethan','Martinez',25,'Sunset Blvd','Brock','Ontario','L1A1A2'),
+    (100000015,5,'Harper','Robinson',42,'Park Lane','Brock','Ontario','L1A1A3'),
+
+    -- Hotel 6
+    (100000016,6,'Benjamin','Clark',19,'Main Street','Picton','Ontario','K0K1A1'),
+    (100000017,6,'Charlotte','Rodriguez',55,'Queen Street','Picton','Ontario','K0K1A2'),
+    (100000018,6,'Henry','Lewis',71,'Victoria Ave','Picton','Ontario','K0K1A3'),
+
+    -- Hotel 7
+    (100000019,7,'Elijah','Lee',14,'Garden Street','Gatineau','Quebec','J8X1A1'),
+    (100000020,7,'Evelyn','Walker',28,'Bridge Road','Gatineau','Quebec','J8X1A2'),
+    (100000021,7,'Alexander','Hall',63,'Valley Ave','Gatineau','Quebec','J8X1A3'),
+
+    -- Hotel 8
+    (100000022,8,'Daniel','Allen',7,'Hillcrest','Ottawa','Ontario','K2A1A1'),
+    (100000023,8,'Abigail','Young',39,'Park Ave','Ottawa','Ontario','K2A1A2'),
+    (100000024,8,'Matthew','King',81,'Riverbank','Ottawa','Ontario','K2A1A3'),
+
+    -- Hotel 9
+    (100000025,9,'Joseph','Wright',16,'Lakeshore','Montreal','Quebec','H2B1B1'),
+    (100000026,9,'Emily','Scott',29,'Mountain Rd','Montreal','Quebec','H2B1B2'),
+    (100000027,9,'David','Green',53,'Central Ave','Montreal','Quebec','H2B1B3'),
+
+    -- Hotel 10
+    (100000028,10,'Samuel','Adams',20,'Forest Lane','Toronto','Ontario','M1A1A1'),
+    (100000029,10,'Ella','Baker',36,'King Street','Toronto','Ontario','M1A1A2'),
+    (100000030,10,'Michael','Nelson',60,'Queen Ave','Toronto','Ontario','M1A1A3');
+
+-- employee positions only for 30 employees prev created
+INSERT INTO employee_position (employee_ssn, hotel_id, position)
+    VALUES
+    -- Hotel 1
+    (100000001,1,'Front desk agent'),
+    (100000002,1,'Housekeeper'),
+    (100000003,1,'Security'),
+
+    -- Hotel 2
+    (100000004,2,'Concierge'),
+    (100000005,2,'Cleaner'),
+    (100000006,2,'Valet'),
+
+    -- Hotel 3
+    (100000007,3,'Chef'),
+    (100000008,3,'Server'),
+    (100000009,3,'Bartender'),
+
+    -- Hotel 4
+    (100000010,4,'Maintenance'),
+    (100000011,4,'Housekeeper'),
+    (100000012,4,'Front desk agent'),
+
+    -- Hotel 5
+    (100000013,5,'Security'),
+    (100000014,5,'Concierge'),
+    (100000015,5,'Cleaner'),
+
+    -- Hotel 6
+    (100000016,6,'Chef'),
+    (100000017,6,'Server'),
+    (100000018,6,'Bartender'),
+
+    -- Hotel 7
+    (100000019,7,'Doorman'),
+    (100000020,7,'Valet'),
+    (100000021,7,'Security'),
+
+    -- Hotel 8
+    (100000022,8,'Front desk agent'),
+    (100000023,8,'Housekeeper'),
+    (100000024,8,'Maintenance'),
+
+    -- Hotel 9
+    (100000025,9,'Chef'),
+    (100000026,9,'Server'),
+    (100000027,9,'Bartender'),
+
+    -- Hotel 10
+    (100000028,10,'Concierge'),
+    (100000029,10,'Cleaner'),
+    (100000030,10,'Valet');

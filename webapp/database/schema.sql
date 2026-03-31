@@ -143,19 +143,6 @@ BEFORE INSERT ON hotel_contact_email
 FOR EACH ROW
 EXECUTE FUNCTION limit_email_per_hotel();
 
-CREATE TABLE Manages (
-    hotel_id INTEGER PRIMARY KEY,
-
-    employee_ssn INTEGER NOT NULL UNIQUE CHECK (employee_ssn between 100000000 and 999999999),
-
-    FOREIGN KEY (hotel_id)
-        REFERENCES hotel(hotel_id)
-        ON DELETE CASCADE,
-
-    FOREIGN KEY (employee_ssn)
-        REFERENCES employee(employee_ssn)
-);
-
 CREATE TABLE if not exists employee (
     employee_ssn INTEGER PRIMARY KEY  CHECK (employee_ssn between 100000000 and 999999999),
     hotel_id INTEGER NOT NULL,
@@ -172,8 +159,21 @@ CREATE TABLE if not exists employee (
         ON DELETE CASCADE
 );
 
+CREATE TABLE if not exists Manages (
+    hotel_id INTEGER PRIMARY KEY,
+
+    employee_ssn INTEGER NOT NULL UNIQUE CHECK (employee_ssn between 100000000 and 999999999),
+
+    FOREIGN KEY (hotel_id)
+        REFERENCES hotel(hotel_id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (employee_ssn)
+        REFERENCES employee(employee_ssn)
+);
+
 CREATE TABLE if not exists employee_position (
-    employee_ssn varchar(20) NOT NULL
+    employee_ssn integer NOT NULL
         CHECK (employee_ssn between 100000000 and 999999999),
 
     hotel_id INTEGER NOT NULL,
@@ -231,7 +231,7 @@ create table if not exists amenity (
     room_number integer not null,
     amenity varchar(20),
 
-    primary key(hotel_id, room_number, amentiy),
+    primary key(hotel_id, room_number, amenity),
     FOREIGN KEY (hotel_id, room_number)
         REFERENCES Room(hotel_id, room_number),
     
@@ -246,7 +246,7 @@ create table if not exists customer (
     city varchar(50) not null,
     province varchar(50) not null,
     zip varchar(6) not null  CHECK (zip ~ '^[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9]$'),
-    customer_id varchar(20) primary key,
+    customer_id INTEGER primary key CHECK (customer_id between 100000000 and 999999999),
     registration_date date not null check(registration_date <= CURRENT_DATE)
 );
 

@@ -1,58 +1,47 @@
 <html>
 <head>
-    <style>
-        body {
-            font-family: Arial;
-            background: linear-gradient(to right, #e4f0fc, #ffffff);
-            text-align: center;
-        }
-
-        .box {
-            width: 350px;
-            margin: 40px auto;
-            padding: 20px;
-            background: rgb(255, 255, 255);
-            border-radius: 10px;
-        }
-
-        input, button {
-            margin: 5px;
-            padding: 8px;
-        }
-
-        button {
-            background: #1e87e9;
-            color: rgb(255, 255, 255);
-            border: none;
-        }
-    </style>
+    <title>Employee Panel</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-<h1>Employee Panel</h1>
+<jsp:include page="WEB-INF/navbar.jsp" />
 
-<div class="box">
-    <h3>Convert Booking → Renting</h3>
+<div class="container">
 
-    <form action="convert" method="post">
-        <input type="number" name="bookingId" placeholder="Booking ID"><br>
-        <input type="number" name="employeeSSN" placeholder="Employee SSN"><br>
-        <button>Convert</button>
-    </form>
-</div>
+    <div class="card">
+        <h2>Convert Booking to Renting</h2>
 
-<div class="box">
-    <h3>Walk-in Renting</h3>
+        <form action="convertBooking" method="post">
+            <div class="form-group">
+                <label>Booking ID</label>
+                <input type="number" name="bookingId">
+            </div>
 
-    <form action="rent" method="post">
-        <input type="number" name="room_number" placeholder="Room #"><br>
-        <input type="text" name="customer_id" placeholder="Customer ID"><br>
-        <input type="date" name="checkin"><br>
-        <input type="date" name="checkout"><br>
-        <input type="number" name="employeeSSN" placeholder="Employee SSN"><br>
-        <button>Rent</button>
-    </form>
+            <button class="btn">Convert</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Walk-in Renting</h2>
+
+        <form action="walkIn" method="post">
+
+            <div class="form-group">
+                <label>Customer Name</label>
+                <input type="text" name="customer">
+            </div>
+
+            <div class="form-group">
+                <label>Room ID</label>
+                <input type="number" name="roomId">
+            </div>
+
+            <button class="btn">Rent</button>
+        </form>
+    </div>
+
 </div>
 
 </body>

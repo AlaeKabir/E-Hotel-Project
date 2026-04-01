@@ -1,63 +1,54 @@
 <%@ page import="java.util.*" %>
-
 <html>
 <head>
-    <style>
-        body {
-            font-family: Arial;
-            background: linear-gradient(to right, #e4f0fc, #ffffff);
-            text-align: center;
-        }
-
-        .card {
-            background: white;
-            padding: 20px;
-            margin: 20px auto;
-            width: 300px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        button {
-            background: #1e87e9;
-            color: rgb(255, 255, 255);
-            border: none;
-            padding: 8px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-    </style>
+    <title>Results</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-<h2>Available Rooms</h2>
+<jsp:include page="WEB-INF/navbar.jsp" />
 
-<%
-List<Map<String, Object>> rooms = (List<Map<String, Object>>) request.getAttribute("rooms");
+<div class="container">
 
-for (Map<String, Object> room : rooms) {
-%>
+    <div class="card">
+        <h2>Available Rooms</h2>
 
-<div class="card">
-    <h3><%= room.get("hotel") %></h3>
-    <p>Price: <%= room.get("price") %></p>
-    <p>Capacity: <%= room.get("capacity") %></p>
+        <table>
+            <tr>
+                <th>Hotel</th>
+                <th>City</th>
+                <th>Capacity</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
 
-    <form action="book" method="post">
-        <input type="hidden" name="room_number" value="<%= room.get("room_number") %>">
+            <%
+                List rooms = (List) request.getAttribute("rooms");
+                if (rooms != null) {
+                    for (Object r : rooms) {
+            %>
+            <tr>
+                <td>Hotel Name</td>
+                <td>City</td>
+                <td>2</td>
+                <td>$150</td>
+                <td>
+                    <form action="bookRoom" method="post">
+                        <input type="hidden" name="roomId" value="1">
+                        <button class="btn">Book</button>
+                    </form>
+                </td>
+            </tr>
+            <%
+                    }
+                }
+            %>
 
-        <input type="text" name="customer_id" placeholder="Customer ID" required><br>
-        <input type="date" name="checkin" required><br>
-        <input type="date" name="checkout" required><br>
+        </table>
+    </div>
 
-        <button>Book</button>
-    </form>
 </div>
-
-<%
-}
-%>
 
 </body>
 </html>

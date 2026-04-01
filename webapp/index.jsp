@@ -1,75 +1,51 @@
-<!DOCTYPE html>
+<%@ page language="java" %>
 <html>
 <head>
     <title>e-Hotels</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: linear-gradient(to right, #e4f0fc, #ffffff);
-            text-align: center;
-            margin: 0;
-        }
-
-        .container {
-            width: 400px;
-            margin: 80px auto;
-            padding: 30px;
-            background: rgb(255, 255, 255);
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            color: #1e87e9;
-        }
-
-        input, button {
-            width: 90%;
-            padding: 10px;
-            margin: 8px 0;
-            border-radius: 8px;
-            border: 1px solid #cccccc;
-        }
-
-        button {
-            background: #1e87e9;
-            color: rgb(255, 255, 255);
-            border: none;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #189ac2;
-        }
-
-        a {
-            display: block;
-            margin-top: 10px;
-            color: #1ec4e9;
-            text-decoration: none;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
+<jsp:include page="WEB-INF/navbar.jsp" />
+
 <div class="container">
-    <h1>e-Hotels</h1>
 
-    <h3>Find your perfect room</h3>
+    <div class="card">
+        <h2>Search Rooms</h2>
 
-    <form action="search" method="get">
-        <input type="text" name="city" placeholder="City" required>
+        <form action="searchRooms" method="get">
 
-        <input type="number" name="capacity" placeholder="Capacity (e.g. 2)" required>
+            <div class="form-group">
+                <label>City</label>
+                <select name="city">
+                    <option value="">Select City</option>
+                    <option>Toronto</option>
+                    <option>Montreal</option>
+                    <option>Vancouver</option>
+                </select>
+            </div>
 
-        <input type="number" name="price" placeholder="Max Price ($)" required>
+            <div class="form-group">
+                <label>Capacity</label>
+                <select name="capacity">
+                    <option value="">Any</option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>4</option>
+                </select>
+            </div>
 
-        <button type="submit">Search Rooms</button>
-    </form>
+            <div class="form-group">
+                <label>Max Price ($)</label>
+                <input type="number" name="price" placeholder="e.g. 200">
+            </div>
 
-    <a href="employee.jsp">Employee Panel</a>
-    <a href="views">View Statistics</a>
+            <button class="btn">Search</button>
+
+        </form>
+    </div>
+
 </div>
 
 </body>

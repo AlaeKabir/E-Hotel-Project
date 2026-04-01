@@ -1,70 +1,38 @@
-<%@ page import="java.util.*" %>
-
 <html>
 <head>
-    <style>
-        body {
-            font-family: Arial;
-            text-align: center;
-        }
-
-        table {
-            margin: auto;
-            border-collapse: collapse;
-            width: 60%;
-        }
-
-        th, td {
-            border: 1px solid #cccccc;
-            padding: 10px;
-        }
-
-        th {
-            background: #1e87e9;
-            color: rgb(255, 255, 255);
-        }
-    </style>
+    <title>Statistics</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-<h2>Available Rooms per Area</h2>
+<jsp:include page="WEB-INF/navbar.jsp" />
 
-<table>
-<tr><th>City</th><th>Rooms</th></tr>
+<div class="container">
 
-<%
-List<Map<String, Object>> v1 = (List<Map<String, Object>>) request.getAttribute("view1");
+    <div class="card">
+        <h2>Database Statistics</h2>
 
-for (Map<String, Object> row : v1) {
-%>
-<tr>
-    <td><%= row.get("city") %></td>
-    <td><%= row.get("available_rooms") %></td>
-</tr>
-<%
-}
-%>
-</table>
+        <table>
+            <tr>
+                <th>View</th>
+                <th>Value</th>
+            </tr>
 
-<h2>Total Capacity per Hotel</h2>
+            <tr>
+                <td>Total Bookings</td>
+                <td>100</td>
+            </tr>
 
-<table>
-<tr><th>Hotel</th><th>Capacity</th></tr>
+            <tr>
+                <td>Available Rooms</td>
+                <td>45</td>
+            </tr>
 
-<%
-List<Map<String, Object>> v2 = (List<Map<String, Object>>) request.getAttribute("view2");
+        </table>
+    </div>
 
-for (Map<String, Object> row : v2) {
-%>
-<tr>
-    <td><%= row.get("hotel_name") %></td>
-    <td><%= row.get("total_capacity") %></td>
-</tr>
-<%
-}
-%>
-</table>
+</div>
 
 </body>
 </html>

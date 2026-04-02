@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS hotel_chain(
 
 
 create table if not exists hotel_chain_contact_phone(
-    hotel_chain_phone integer primary key CHECK (hotel_chain_phone between 10000000000 and 99999999999),
+    hotel_chain_phone bigint primary key CHECK (hotel_chain_phone between 1000000000 and 99999999999),
     hotel_chain_id integer not null,
     foreign key (hotel_chain_id) 
         references hotel_chain(hotel_chain_id) on delete cascade

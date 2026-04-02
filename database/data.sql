@@ -1,10 +1,10 @@
 INSERT INTO hotel_chain(hotel_chain_id, street_number, city, province, zip, num_of_hotels, hotel_chain_name)
 Values 
-(1, 125, 'Kingston', 'Ontario', 'R2K5I5', 8, 'Star Hotels'),
-(2, 13, 'Ottawa', 'Ontario', 'K3K4I2', 9, 'Jamie Houses You'),
-(3, 124,  'Edmonton', 'Alberta', 'H4K5I6', 8, 'Edmonton Best'),
-(4, 12, 'Vancouver', 'British Columbia', 'H3K5O3', 10, 'Chateau Vanny'),
-(5, 14, 'Hamilton', 'Ontario', 'K4K2H6', 8, 'Alexander Hotels');
+(1, 125, 'Foot Lane','Kingston', 'Ontario', 'R2K5I5', 8, 'Star Hotels'),
+(2, 13, 'Lazy Lane', 'Ottawa', 'Ontario', 'K3K4I2', 9, 'Jamie Houses You'),
+(3, 124, 'Twisted Tower Road', 'Edmonton', 'Alberta', 'H4K5I6', 8, 'Edmonton Best'),
+(4, 12, 'Anita Maxwinn Avenue', 'Vancouver', 'British Columbia', 'H3K5O3', 10, 'Chateau Vanny'),
+(5, 14, 'Travell Road', 'Hamilton', 'Ontario', 'K4K2H6', 8, 'Alexander Hotels');
 
 
 insert into hotel_chain_contact_phone(hotel_chain_phone, hotel_chain_id)
@@ -263,3 +263,24 @@ INSERT INTO employee_position (employee_ssn, hotel_id, position)
     (100000028,10,'Concierge'),
     (100000029,10,'Cleaner'),
     (100000030,10,'Valet');
+
+--inserting managers, picking the first employee from each hotel
+INSERT INTO Manages (hotel_id, employee_ssn)
+    VALUES
+    (1,100000001),
+    (2,100000004),
+    (3,100000007),
+    (4,100000010),
+    (5,100000013),
+    (6,100000016),
+    (7,100000019),
+    (8,100000022),
+    (9,100000025),
+    (10,100000028);
+
+--adding rentings and bookings
+insert into renting_booking (hotel_id, room_number, customer_id, renting_booking_id, checkin_date, checkout_date, employee_responable, booking, booking_date)
+values 
+(1, )
+
+--NEED TO CREATE CUSTOMERS, THEN TEST INSERTION DATA

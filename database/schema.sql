@@ -119,7 +119,7 @@ create table if not exists hotel_contact_email(
     hotel_id integer not null,
     foreign key (hotel_id) 
         references hotel(hotel_id) on delete cascade,
-        CONSTRAINT CHK_Email_Charindex CHECK (CHARINDEX('@', Email) > 0)
+        CHECK (hotel_email ~ '^[^@]+@[^@]+\.[^@]+$')
 );
 
 
@@ -253,11 +253,11 @@ create table if not exists customer (
 create table if not exists renting_booking (
     hotel_id integer not null,
     room_number integer not null,
-    customer_id varchar(20) not null,
+    customer_id INTEGER not null check (customer_id between 100000000 and 999999999),
     renting_booking_id integer not null,
     checkin_date date not null,
     checkout_date date not null,
-    employee_responsable varchar(20) not null,
+    employee_responsable integer not null CHECK (employee_ssn between 100000000 and 999999999),
     booking boolean not null,
     booking_date date,
     PRIMARY KEY (renting_booking_id),
@@ -333,6 +333,7 @@ create table if not exists archived_renting_booking (
     checkout_date date not null,
     booking_date date,
     booking boolean not null,
+	employee_responsable integer not null  CHECK (employee_responsable between 100000000 and 999999999),
     check(checkin_date < checkout_date),
     CHECK (
     (booking = TRUE AND booking_date IS NOT NULL)
@@ -340,7 +341,6 @@ create table if not exists archived_renting_booking (
       UNIQUE (
         hotel_id,
         room_number,
-        customer_id,
         checkin_date,
         checkout_date,
         employee_responsable,
@@ -348,4 +348,5 @@ create table if not exists archived_renting_booking (
         booking_date
     )
 );
+
 

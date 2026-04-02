@@ -278,9 +278,45 @@ INSERT INTO Manages (hotel_id, employee_ssn)
     (9,100000025),
     (10,100000028);
 
---adding rentings and bookings
-insert into renting_booking (hotel_id, room_number, customer_id, renting_booking_id, checkin_date, checkout_date, employee_responable, booking, booking_date)
-values 
-(1, )
 
---NEED TO CREATE CUSTOMERS, renting_bookings and archived renting_bookings
+insert into customer(first_name, last_name, street_number, street_name, city, province, zip, customer_id, registration_date)
+values
+('John', 'Doe', 123, 'Main Street', 'Toronto', 'Ontario', 'M1A1A1', 100000031, '2023-01-01'),
+('Jane', 'Smith', 456, 'Oak Avenue', 'Vancouver', 'British Columbia', 'V5T1X4', 100000032, '2023-02-15'),
+('Michael', 'Johnson', 789, 'Pine Road', 'Montreal', 'Quebec', 'H1A1A1', 100000033, '2023-03-10'),
+('Emily', 'Davis', 321, 'Cedar Street', 'Calgary', 'Alberta', 'T2P1J9', 100000034, '2023-04-05'),
+('David', 'Wilson', 654, 'Birch Lane', 'Ottawa', 'Ontario', 'K1B1B1', 100000035, '2023-05-20');
+
+--adding rentings and bookings
+insert into renting_booking (hotel_id, room_number, customer_id, renting_booking_id, checkin_date, checkout_date, employee_responsable, booking, booking_date)
+values 
+--bookings
+(1, 1, 100000031, 1, '2026-06-01', '2026-06-05', 100000001, true, '2025-05-01'),
+(1, 2, 100000032, 2, '2026-06-10', '2026-06-15', 100000002, true, '2025-05-10'),
+(2, 1, 100000033, 3, '2026-07-01', '2026-07-05', 100000004, true, '2025-06-01'),
+(2, 2, 100000034, 4, '2026-07-10', '2026-07-15', 100000005, true, '2025-06-10'),
+(3, 1, 100000035, 5, '2026-08-01', '2026-08-05', 100000007, true, '2025-07-01'),
+--rentings
+(1, 3, 100000031, 6, '2026-05-01', '2026-05-10', 100000001, false, null),
+(1, 4, 100000032, 7, '2026-05-15', '2026-05-20', 100000002, false, null),
+(2, 3, 100000033, 8, '2026-06-01', '2026-06-10', 100000004, false, null),
+(2, 4, 100000034, 9, '2026-12-15', '2027-01-20', 100000005, false, null),
+(3, 2, 100000035, 10, '2026-06-01', '2026-07-10', 100000007, false, null);
+
+
+insert into renting_booking_archive(hotel_id, archived_renting_booking_id, room_number, checkin_date, checkout_date, booking_date, booking, customer_id, employee_responable)
+values
+--archived bookings
+(1, 1, 1, '2023-06-01', '2023-06-05', '2023-05-01', true, 100000031, 100000001),
+(1, 2, 2, '2023-06-10', '2023-06-15', '2023-05-10', true, 100000032, 100000002),
+(2, 3, 1, '2023-07-01', '2023-07-05', '2023-06-01', true, 100000033, 100000004),
+(2, 4, 2, '2023-07-10', '2023-07-15', '2023-06-10', true, 100000034, 100000005),
+(3, 5, 1, '2023-08-01', '2023-08-05', '2023-07-01', true, 100000035, 100000007),
+
+--archived rentings
+(1, 6, 3, '2023-05-01', '2023-05-10', null, false, 100000031, 100000001),
+(1, 7, 4, '2023-05-15', '2023-05-20', null, false, 100000032, 100000002),
+(2, 8, 3, '2023-06-01', '2023-06-10', null, false, 100000033, 100000004),
+(2, 9, 4, '2023-06-15', '2023-06-20', null, false, 100000034, 100000005),
+(3, 10, 2, '2023-07-01', '2023-07-10', null, false, 100000035, 100000007);
+

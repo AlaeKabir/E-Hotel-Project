@@ -305,10 +305,10 @@ RETURNS TRIGGER AS $$
 BEGIN
     IF EXISTS (
         SELECT 1
-        FROM Renting r
+        FROM Renting_booking r
         WHERE r.hotel_id = NEW.hotel_id
           AND r.room_number = NEW.room_number
-          AND r.renting_id <> NEW.renting_id
+          AND r.renting_booking_id <> NEW.renting_booking_id
           AND NEW.checkin_date < r.checkout_date
           AND NEW.checkout_date > r.checkin_date
     ) THEN
@@ -321,7 +321,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trg_check_renting_overlap
 BEFORE INSERT OR UPDATE
-ON Renting
+ON Renting_booking
 FOR EACH ROW
 EXECUTE FUNCTION check_renting_overlap();
 
@@ -333,6 +333,7 @@ create table if not exists archived_renting_booking (
     checkout_date date not null,
     booking_date date,
     booking boolean not null,
+    customer_id INTEGER not null check (customer_id between 100000000 and 999999999),
 	employee_responsable integer not null  CHECK (employee_responsable between 100000000 and 999999999),
     check(checkin_date < checkout_date),
     CHECK (
@@ -345,7 +346,8 @@ create table if not exists archived_renting_booking (
         checkout_date,
         employee_responsable,
         booking,
-        booking_date
+        booking_date,
+        customer_id
     )
 );
 

@@ -1,21 +1,41 @@
 package com.example.servlet;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.WebServlet;
-import java.io.IOException;
+import com.example.dao.ViewDAO;
+import com.example.model.Room;
 
-@WebServlet("/views")   // 👈 RIGHT HERE
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.util.List;
+
+@WebServlet("/views")
 public class ViewsServlet extends HttpServlet {
 
-    protected void doGet(HttpServletRequest req, HttpServletResponse res)
+    private ViewDAO viewDAO;
+
+    @Override
+    public void init() throws ServletException {
+        viewDAO = new ViewDAO();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        ViewDAO dao = new ViewDAO();
+        try {
+            List<Room> rooms = viewDAO.getAvailableRooms();
 
-        req.setAttribute("view1", dao.getAvailableRooms());
-        req.setAttribute("view2", dao.getCapacity());
+            request.setAttribute("rooms", rooms);
 
-        req.getRequestDispatcher("/WEB-INF/views.jsp").forward(req, res);
+            request.getRequestDispatcher("/views.jsp")
+                    .forward(request, response);
+
+        } catch (Exception e) {
+            throw new ServletException("Error loading available rooms", e);
+        }
     }
 }

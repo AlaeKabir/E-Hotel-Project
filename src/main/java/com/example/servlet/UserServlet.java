@@ -1,3 +1,17 @@
+package com.example.servlet;
+import com.example.dao.UserDAO;
+import com.example.model.User;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
 //RANDOM EXAMPLE I STOLE FROM CLAUDE TO USE AS REFERENCE
 // src/main/java/com/example/UserServlet.java
 @WebServlet("/users")

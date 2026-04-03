@@ -1,41 +1,34 @@
-<div class="card">
-    <h2>Available Rooms</h2>
+<%@ page import="java.util.*, com.example.model.Room" %>
 
-    <%
-        List rooms = (List) request.getAttribute("rooms");
-        if (rooms == null || rooms.isEmpty()) {
-    %>
+<html>
+<body>
 
-        <div class="empty">No rooms found 😕</div>
+<h2>Available Rooms</h2>
 
-    <%
-        } else {
-    %>
+<%
+    List<Room> rooms = (List<Room>) request.getAttribute("rooms");
+%>
 
-    <table>
-        <tr>
-            <th>Hotel</th>
-            <th>City</th>
-            <th>Guests</th>
-            <th>Price</th>
-            <th></th>
-        </tr>
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Price</th>
+        <th>Capacity</th>
+    </tr>
 
-        <% for (Object r : rooms) { %>
-        <tr>
-            <td>Hilton</td>
-            <td>Toronto</td>
-            <td>2</td>
-            <td class="price">$150</td>
-            <td>
-                <form action="bookRoom" method="post">
-                    <button class="btn">Book</button>
-                </form>
-            </td>
-        </tr>
-        <% } %>
+<%
+    for (Room r : rooms) {
+%>
+    <tr>
+        <td><%= r.getId() %></td>
+        <td><%= r.getPrice() %></td>
+        <td><%= r.getCapacity() %></td>
+    </tr>
+<%
+    }
+%>
 
-    </table>
+</table>
 
-    <% } %>
-</div>
+</body>
+</html>

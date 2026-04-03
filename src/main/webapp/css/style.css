@@ -1,0 +1,85 @@
+:root {
+    --primary-color: #61bdfb;
+    --background-color: #eef6ff;
+    --dark-bg: #1f2a33;
+    --text-color: #1c2b39;
+}
+
+body {
+    margin: 0;
+    font-family: 'Fredoka', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+* {
+    box-sizing: border-box;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Layout wrapper (like React) */
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Card UI */
+.card-custom {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #4aa8e0;
+}
+
+/* Navbar */
+.custom-navbar {
+    background-color: #dae7fa !important; /* soft blue */
+    padding: 12px 20px;
+}
+
+/* Brand + links */
+.custom-navbar .navbar-brand,
+.custom-navbar .nav-link {
+    color: #3a4c5d !important;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+/* Hover effect */
+.custom-navbar .nav-link:hover {
+    color: rgb(105, 165, 255) !important;
+}
+
+/* Optional: active link */
+.custom-navbar .nav-link.active {
+    color: #1e90ff !important;
+}
+
+/* Slight spacing */
+.navbar-nav .nav-link {
+    margin-left: 15px;
+}
+
+.custom-footer {
+    background-color: #dae7fa;
+    padding: 15px 20px;
+    margin-top: auto;
+    text-align: center;
+}
+
+.custom-footer p {
+    margin: 0;
+    color: #3a4c5d;
+    font-weight: 500;
+}

@@ -1,3 +1,0 @@
-Protected files (only servlets can access)
-
-This WEB-INF directory is used to store protected resources such as configuration files and JSP pages that should not be directly accessible by users. Any content inside this folder can only be accessed through server-side components such as Servlets, improving security and enforcing proper MVC architecture.

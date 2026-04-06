@@ -3,6 +3,7 @@ package com.example.model;
 public class Room {
 
     private int hotelId;
+    private String hotelName;
     private int roomNumber;
     private double price;
     private int capacity;
@@ -14,6 +15,9 @@ public class Room {
 
     public int getHotelId() { return hotelId; }
     public void setHotelId(int hotelId) { this.hotelId = hotelId; }
+
+    public String getHotelName() { return hotelName; }
+    public void setHotelName(String hotelName) { this.hotelName = hotelName; }
 
     public int getRoomNumber() { return roomNumber; }
     public void setRoomNumber(int roomNumber) { this.roomNumber = roomNumber; }

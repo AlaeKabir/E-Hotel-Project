@@ -19,7 +19,7 @@ public class RoomDAO {
     try (Connection conn = DBConnection.getConnection()) {
 
         String sql =
-            "SELECT r.* FROM room r " +
+            "SELECT r.*, h.hotel_name FROM room r " +
             "JOIN hotel h ON r.hotel_id = h.hotel_id " +
             "JOIN hotel_chain c ON h.hotel_chain_id = c.hotel_chain_id " +
             "WHERE 1=1";
@@ -56,7 +56,6 @@ public class RoomDAO {
             params.add(viewType);
         }
 
-        // Exclude rooms already booked in the requested date range
         if (startDate != null && !startDate.isEmpty() &&
             endDate   != null && !endDate.isEmpty()) {
             sql += " AND NOT EXISTS (" +
@@ -95,6 +94,7 @@ public class RoomDAO {
             r.setViewType(rs.getString("view_type"));
             r.setExtendable(rs.getBoolean("extendable"));
             r.setDamages(rs.getBoolean("damages"));
+            r.setHotelName(rs.getString("hotel_name"));
             rooms.add(r);
         }
 

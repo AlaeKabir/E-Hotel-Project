@@ -130,7 +130,7 @@
                         <div class="room-card">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
-                                    <h6 class="mb-1">Hotel #<%= r.getHotelId() %> — Room <%= r.getRoomNumber() %></h6>
+                                    <h6 class="mb-1"><%= r.getHotelName() %> — Room <%= r.getRoomNumber() %></h6>
                                     <small class="text-muted"><%= r.getViewType() %> view</small>
                                 </div>
                                 <span class="fs-5 fw-bold text-primary">$<%= String.format("%.2f", r.getPrice()) %>/night</span>

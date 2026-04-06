@@ -1,0 +1,82 @@
+package com.example.dao;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.time.LocalDate;
+
+import com.example.model.Booking;
+
+public class BookingDAO {
+
+    public boolean insertBooking(Booking b) {
+        String sql = "INSERT INTO renting_booking " +
+                     "(hotel_id, room_number, customer_id, renting_booking_id, " +
+                     " checkin_date, checkout_date, employee_responsable, booking, booking_date) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, b.getHotelId());
+            ps.setInt(2, b.getRoomNumber());
+            ps.setInt(3, b.getCustomerId());
+            ps.setInt(4, getNextBookingId(conn));
+            ps.setDate(5, Date.valueOf(b.getCheckinDate()));
+            ps.setDate(6, Date.valueOf(b.getCheckoutDate()));
+            ps.setInt(7, b.getEmployeeResponsable());
+            ps.setBoolean(8, b.isBooking());
+
+            // booking_date only set if it's a booking, null for renting
+            if (b.isBooking()) {
+                ps.setDate(9, Date.valueOf(LocalDate.now()));
+            } else {
+                ps.setNull(9, Types.DATE);
+            }
+
+            return ps.executeUpdate() == 1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private int getNextBookingId(Connection conn) throws SQLException {
+        String sql = "SELECT COALESCE(MAX(renting_booking_id), 0) + 1 FROM renting_booking";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? rs.getInt(1) : 1;
+        }
+    }
+
+    // Fetch bookings for a customer (for 2c nested query UI)
+    public java.util.List<Booking> getBookingsByCustomer(int customerId) {
+        java.util.List<Booking> list = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM renting_booking WHERE customer_id = ? ORDER BY checkin_date DESC";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Booking b = new Booking();
+                b.setRentingBookingId(rs.getInt("renting_booking_id"));
+                b.setHotelId(rs.getInt("hotel_id"));
+                b.setRoomNumber(rs.getInt("room_number"));
+                b.setCustomerId(rs.getInt("customer_id"));
+                b.setCheckinDate(rs.getDate("checkin_date").toLocalDate());
+                b.setCheckoutDate(rs.getDate("checkout_date").toLocalDate());
+                b.setBooking(rs.getBoolean("booking"));
+                Date bd = rs.getDate("booking_date");
+                if (bd != null) b.setBookingDate(bd.toLocalDate());
+                list.add(b);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+}

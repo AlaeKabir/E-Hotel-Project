@@ -10,74 +10,89 @@ import com.example.model.Room;
 
 public class RoomDAO {
 
-    public List<Room> searchRooms(String area, String chain, String category,
-                                  int capacity, double price) {
+    public List<Room> searchRooms(String city, String chain, int starRating,
+                               int capacity, double price,
+                               String viewType, String startDate, String endDate) {
 
-        List<Room> rooms = new ArrayList<>();
+    List<Room> rooms = new ArrayList<>();
 
-        try (Connection conn = DBConnection.getConnection()) {
+    try (Connection conn = DBConnection.getConnection()) {
 
-            // Base SQL
-            String sql =
-                "SELECT r.* FROM room r " +
-                "JOIN hotel h ON r.hotel_id = h.hotel_id " +
-                "JOIN hotel_chain c ON h.hotel_chain_id = c.hotel_chain_id " +
-                "WHERE 1=1";
+        String sql =
+            "SELECT r.* FROM room r " +
+            "JOIN hotel h ON r.hotel_id = h.hotel_id " +
+            "JOIN hotel_chain c ON h.hotel_chain_id = c.hotel_chain_id " +
+            "WHERE 1=1";
 
-            // List to store parameters for PreparedStatement
-            List<Object> params = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
 
-            // Optional filters
-            if (area != null && !area.isEmpty()) {
-                sql += " AND h.address LIKE ?";
-                params.add("%" + area + "%");
-            }
-
-            if (capacity > 0) {
-                sql += " AND r.capacity >= ?";
-                params.add(capacity);
-            }
-
-            if (price > 0) {
-                sql += " AND r.price <= ?";
-                params.add(price);
-            }
-
-            if (category != null && !category.isEmpty()) {
-                sql += " AND h.category = ?";
-                params.add(category);
-            }
-
-            if (chain != null && !chain.isEmpty()) {
-                sql += " AND c.name = ?";
-                params.add(chain);
-            }
-
-            // Prepare statement
-            PreparedStatement ps = conn.prepareStatement(sql);
-
-            // Set parameters dynamically
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
-            }
-
-            // Execute query
-            ResultSet rs = ps.executeQuery();
-
-            // Map results to Room objects
-            while (rs.next()) {
-                Room r = new Room();
-                r.setId(rs.getInt("id"));
-                r.setHotelId(rs.getInt("hotel_id"));
-                r.setCapacity(rs.getInt("capacity"));
-                r.setPrice(rs.getDouble("price"));
-                rooms.add(r);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (city != null && !city.isEmpty()) {
+            sql += " AND h.city ILIKE ?";
+            params.add("%" + city + "%");
         }
 
-        return rooms;
+        if (chain != null && !chain.isEmpty()) {
+            sql += " AND c.hotel_chain_name ILIKE ?";
+            params.add("%" + chain + "%");
+        }
+
+        if (starRating > 0) {
+            sql += " AND h.star_rating = ?";
+            params.add(starRating);
+        }
+
+        if (capacity > 0) {
+            sql += " AND r.capacity >= ?";
+            params.add(capacity);
+        }
+
+        if (price > 0) {
+            sql += " AND r.price <= ?";
+            params.add(price);
+        }
+
+        if (viewType != null && !viewType.isEmpty()) {
+            sql += " AND r.view_type = ?";
+            params.add(viewType);
+        }
+
+        // Exclude rooms already booked in the requested date range
+        if (startDate != null && !startDate.isEmpty() &&
+            endDate   != null && !endDate.isEmpty()) {
+            sql += " AND NOT EXISTS (" +
+                   "  SELECT 1 FROM renting_booking rb" +
+                   "  WHERE rb.hotel_id    = r.hotel_id" +
+                   "    AND rb.room_number = r.room_number" +
+                   "    AND rb.checkin_date  < ?::date" +
+                   "    AND rb.checkout_date > ?::date" +
+                   ")";
+            params.add(endDate);
+            params.add(startDate);
+        }
+
+        PreparedStatement ps = conn.prepareStatement(sql);
+        for (int i = 0; i < params.size(); i++) {
+            ps.setObject(i + 1, params.get(i));
+        }
+
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            Room r = new Room();
+            r.setHotelId(rs.getInt("hotel_id"));
+            r.setRoomNumber(rs.getInt("room_number"));
+            r.setPrice(rs.getDouble("price"));
+            r.setCapacity(rs.getInt("capacity"));
+            r.setViewType(rs.getString("view_type"));
+            r.setExtendable(rs.getBoolean("extendable"));
+            r.setDamages(rs.getBoolean("damages"));
+            rooms.add(r);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+
+    return rooms;
+}
 }

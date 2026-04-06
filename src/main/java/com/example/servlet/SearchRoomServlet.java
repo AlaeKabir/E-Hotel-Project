@@ -1,5 +1,8 @@
 package com.example.servlet;
 
+import java.io.IOException;
+import java.util.List;
+
 import com.example.dao.RoomDAO;
 import com.example.model.Room;
 
@@ -9,28 +12,27 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
-import java.util.List;
-
 @WebServlet("/searchRooms")
 public class SearchRoomServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String area = request.getParameter("area");
-        String chain = request.getParameter("chain");
-        String category = request.getParameter("category");
+        String city       = request.getParameter("city");
+        String chain      = request.getParameter("chain");
+        String viewType   = request.getParameter("viewType");
+        String startDate  = request.getParameter("startDate");
+        String endDate    = request.getParameter("endDate");
 
-        int capacity = parseInt(request.getParameter("capacity"));
-        double price = parseDouble(request.getParameter("price"));
+        int starRating = parseInt(request.getParameter("starRating"));
+        int capacity   = parseInt(request.getParameter("capacity"));
+        double price   = parseDouble(request.getParameter("price"));
 
         RoomDAO dao = new RoomDAO();
-
-        List<Room> rooms = dao.searchRooms(area, chain, category, capacity, price);
+        List<Room> rooms = dao.searchRooms(city, chain, starRating, capacity, price, viewType, startDate, endDate);
 
         request.setAttribute("rooms", rooms);
-        request.getRequestDispatcher("/customer/results.jsp").forward(request, response);
+        request.getRequestDispatcher("/customer/search.jsp").forward(request, response);
     }
 
     private int parseInt(String val) {

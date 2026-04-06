@@ -1,23 +1,23 @@
-CREATE TABLE IF NOT EXISTS hotel_chain(
+CREATE TABLE IF NOT EXISTS hotel_chain (
     hotel_chain_id integer primary key,
-    street_number integer not null check( street_number>0),
-    street_name  varchar(50) not null,
+    street_number integer not null check (street_number > 0),
+    street_name varchar(50) not null,
     city varchar(50) not null,
     province varchar(50) not null,
-    zip varchar(6) not null  CHECK (zip ~ '^[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9]$'),
-    num_of_hotels integer not null check (num_of_hotels>=1),
+    zip varchar(6) not null CHECK (
+        zip ~ '^[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9]$'
+    ),
+    num_of_hotels integer not null check (num_of_hotels >= 1),
     hotel_chain_name varchar(50) not null unique
 );
 
-
-
-create table if not exists hotel_chain_contact_phone(
-    hotel_chain_phone bigint primary key CHECK (hotel_chain_phone between 1000000000 and 99999999999),
+create table if not exists hotel_chain_contact_phone (
+    hotel_chain_phone bigint primary key CHECK (
+        hotel_chain_phone between 1000000000 and 99999999999
+    ),
     hotel_chain_id integer not null,
-    foreign key (hotel_chain_id) 
-        references hotel_chain(hotel_chain_id) on delete cascade
+    foreign key (hotel_chain_id) references hotel_chain (hotel_chain_id) on delete cascade
 );
-
 
 CREATE OR REPLACE FUNCTION limit_phone_per_chain()
 RETURNS TRIGGER AS $$
@@ -39,15 +39,14 @@ BEFORE INSERT ON hotel_chain_contact_phone
 FOR EACH ROW
 EXECUTE FUNCTION limit_phone_per_chain();
 
-create table if not exists hotel_chain_contact_email(
+create table if not exists hotel_chain_contact_email (
     hotel_chain_email varchar(50) primary key,
     hotel_chain_id integer not null,
-    foreign key (hotel_chain_id) 
-        references hotel_chain(hotel_chain_id) on delete cascade,
-    CONSTRAINT chk_email_at
-        CHECK (hotel_chain_email ~ '^[^@]+@[^@]+\.[^@]+$')
+    foreign key (hotel_chain_id) references hotel_chain (hotel_chain_id) on delete cascade,
+    CONSTRAINT chk_email_at CHECK (
+        hotel_chain_email ~ '^[^@]+@[^@]+\.[^@]+$'
+    )
 );
-
 
 CREATE OR REPLACE FUNCTION limit_email_per_chain()
 RETURNS TRIGGER AS $$
@@ -69,30 +68,29 @@ BEFORE INSERT ON hotel_chain_contact_email
 FOR EACH ROW
 EXECUTE FUNCTION limit_email_per_chain();
 
-create table if not exists hotel(
+create table if not exists hotel (
     hotel_id integer primary key,
     hotel_chain_id integer not null,
-    street_number integer not null check( street_number>0),
-    street_name  varchar(50) not null,
+    street_number integer not null check (street_number > 0),
+    street_name varchar(50) not null,
     city varchar(50) not null,
     province varchar(50) not null,
-    zip varchar(6) not null  CHECK (zip ~ '^[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9]$'),
+    zip varchar(6) not null CHECK (
+        zip ~ '^[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9]$'
+    ),
     hotel_name varchar(50) not null unique,
-    num_of_rooms integer not null check(num_of_rooms>=1),
-    star_rating integer not null check(star_rating between 1 and 5),
+    num_of_rooms integer not null check (num_of_rooms >= 1),
+    star_rating integer not null check (star_rating between 1 and 5),
     manager_ssn integer not null unique
 );
 
-
-create table if not exists hotel_contact_phone(
-    hotel_phone integer primary key CHECK (hotel_phone between 10000000000 and 99999999999),
+create table if not exists hotel_contact_phone (
+    hotel_phone bigint primary key CHECK (
+        hotel_phone between 1000000000 and 99999999999
+    ),
     hotel_id integer not null,
-    foreign key (hotel_id) 
-        references hotel(hotel_id) on delete cascade
+    foreign key (hotel_id) references hotel (hotel_id) on delete cascade
 );
-
-
-
 
 CREATE OR REPLACE FUNCTION limit_phone_per_hotel()
 RETURNS TRIGGER AS $$
@@ -114,14 +112,14 @@ BEFORE INSERT ON hotel_contact_phone
 FOR EACH ROW
 EXECUTE FUNCTION limit_phone_per_hotel();
 
-create table if not exists hotel_contact_email(
+create table if not exists hotel_contact_email (
     hotel_email varchar(50) primary key,
     hotel_id integer not null,
-    foreign key (hotel_id) 
-        references hotel(hotel_id) on delete cascade,
-        CHECK (hotel_email ~ '^[^@]+@[^@]+\.[^@]+$')
+    foreign key (hotel_id) references hotel (hotel_id) on delete cascade,
+    CHECK (
+        hotel_email ~ '^[^@]+@[^@]+\.[^@]+$'
+    )
 );
-
 
 CREATE OR REPLACE FUNCTION limit_email_per_hotel()
 RETURNS TRIGGER AS $$
@@ -144,133 +142,149 @@ FOR EACH ROW
 EXECUTE FUNCTION limit_email_per_hotel();
 
 CREATE TABLE if not exists employee (
-    employee_ssn INTEGER PRIMARY KEY  CHECK (employee_ssn between 100000000 and 999999999),
+    employee_ssn INTEGER PRIMARY KEY CHECK (
+        employee_ssn between 100000000 and 999999999
+    ),
     hotel_id INTEGER NOT NULL,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
-    street_number integer not null check( street_number>0),
-    street_name  varchar(50) not null,
+    street_number integer not null check (street_number > 0),
+    street_name varchar(50) not null,
     city varchar(50) not null,
     province varchar(50) not null,
-    zip varchar(6) not null  CHECK (zip ~ '^[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9]$'),
-
-    FOREIGN KEY (hotel_id)
-        REFERENCES hotel(hotel_id)
-        ON DELETE CASCADE
+    zip varchar(6) not null CHECK (
+        zip ~ '^[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9]$'
+    ),
+    FOREIGN KEY (hotel_id) REFERENCES hotel (hotel_id) ON DELETE CASCADE
 );
 
 CREATE TABLE if not exists Manages (
     hotel_id INTEGER PRIMARY KEY,
-
-    employee_ssn INTEGER NOT NULL UNIQUE CHECK (employee_ssn between 100000000 and 999999999),
-
-    FOREIGN KEY (hotel_id)
-        REFERENCES hotel(hotel_id)
-        ON DELETE CASCADE,
-
-    FOREIGN KEY (employee_ssn)
-        REFERENCES employee(employee_ssn)
+    employee_ssn INTEGER NOT NULL UNIQUE CHECK (
+        employee_ssn between 100000000 and 999999999
+    ),
+    FOREIGN KEY (hotel_id) REFERENCES hotel (hotel_id) ON DELETE CASCADE,
+    FOREIGN KEY (employee_ssn) REFERENCES employee (employee_ssn)
 );
 
 CREATE TABLE if not exists employee_position (
-    employee_ssn integer NOT NULL
-        CHECK (employee_ssn between 100000000 and 999999999),
-
+    employee_ssn integer NOT NULL CHECK (
+        employee_ssn between 100000000 and 999999999
+    ),
     hotel_id INTEGER NOT NULL,
-
-    position VARCHAR(30) NOT NULL
-        CHECK (
-            position IN (
-                'Doorman',
-                'Concierge',
-                'Valet',
-                'Security',
-                'Front desk agent',
-                'Housekeeper',
-                'Maintenance',
-                'Cleaner',
-                'Server',
-                'Bartender',
-                'Chef'
-            )
-        ),
-
-    PRIMARY KEY (employee_ssn, hotel_id, position),
-
-    FOREIGN KEY (hotel_id)
-        REFERENCES hotel(hotel_id)
-        ON DELETE CASCADE,
-
-    FOREIGN KEY (employee_ssn)
-        REFERENCES employee(employee_ssn)
-        ON DELETE CASCADE
+    position VARCHAR(30) NOT NULL CHECK (
+        position IN (
+            'Doorman',
+            'Concierge',
+            'Valet',
+            'Security',
+            'Front desk agent',
+            'Housekeeper',
+            'Maintenance',
+            'Cleaner',
+            'Server',
+            'Bartender',
+            'Chef'
+        )
+    ),
+    PRIMARY KEY (
+        employee_ssn,
+        hotel_id,
+        position
+    ),
+    FOREIGN KEY (hotel_id) REFERENCES hotel (hotel_id) ON DELETE CASCADE,
+    FOREIGN KEY (employee_ssn) REFERENCES employee (employee_ssn) ON DELETE CASCADE
 );
 
 CREATE TABLE if not exists Room (
     hotel_id integer NOT NULL,
     room_number integer NOT NULL,
-    price DECIMAL(10,2) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
     capacity integer NOT NULL,
     view_type VARCHAR(20),
     extendable BOOLEAN NOT NULL,
     damages BOOLEAN NOT NULL,
-
     PRIMARY KEY (hotel_id, room_number),
-
-    FOREIGN KEY (hotel_id) REFERENCES Hotel(hotel_id),
-
+    FOREIGN KEY (hotel_id) REFERENCES Hotel (hotel_id),
     CHECK (price > 0),
     CHECK (capacity > 0),
-    CHECK (view_type IN ('Sea', 'Mountain')),
-
-    CHECK (NOT (capacity = 1 AND extendable = TRUE))
+    CHECK (
+        view_type IN ('Sea', 'Mountain')
+    ),
+    CHECK (
+        NOT(
+            capacity = 1
+            AND extendable = TRUE
+        )
+    )
 );
 
 create table if not exists amenity (
     hotel_id integer not null,
     room_number integer not null,
     amenity varchar(20),
-
-    primary key(hotel_id, room_number, amenity),
-    FOREIGN KEY (hotel_id, room_number)
-        REFERENCES Room(hotel_id, room_number),
-    
-    CHECK (amenity IN ('TV', 'AC', 'WiFi', 'Fridge', 'Microwave', 'Iron'))
+    primary key (
+        hotel_id,
+        room_number,
+        amenity
+    ),
+    FOREIGN KEY (hotel_id, room_number) REFERENCES Room (hotel_id, room_number),
+    CHECK (
+        amenity IN (
+            'TV',
+            'AC',
+            'WiFi',
+            'Fridge',
+            'Microwave',
+            'Iron'
+        )
+    )
 );
 
 create table if not exists customer (
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
-    street_number integer not null check( street_number>0),
-    street_name  varchar(50) not null,
+    street_number integer not null check (street_number > 0),
+    street_name varchar(50) not null,
     city varchar(50) not null,
     province varchar(50) not null,
-    zip varchar(6) not null  CHECK (zip ~ '^[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9]$'),
-    customer_id INTEGER primary key CHECK (customer_id between 100000000 and 999999999),
-    registration_date date not null check(registration_date <= CURRENT_DATE)
+    zip varchar(6) not null CHECK (
+        zip ~ '^[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9]$'
+    ),
+    customer_id INTEGER primary key CHECK (
+        customer_id between 100000000 and 999999999
+    ),
+    registration_date date not null check (
+        registration_date <= CURRENT_DATE
+    )
 );
 
 create table if not exists renting_booking (
     hotel_id integer not null,
     room_number integer not null,
-    customer_id INTEGER not null check (customer_id between 100000000 and 999999999),
+    customer_id INTEGER not null check (
+        customer_id between 100000000 and 999999999
+    ),
     renting_booking_id integer not null,
     checkin_date date not null,
     checkout_date date not null,
-    employee_responsable integer not null CHECK (employee_ssn between 100000000 and 999999999),
+    employee_responsable integer not null CHECK (
+        employee_responsable between 100000000 and 999999999
+    ),
     booking boolean not null,
     booking_date date,
     PRIMARY KEY (renting_booking_id),
-    FOREIGN KEY (hotel_id, room_number)
-        REFERENCES Room(hotel_id, room_number),
-    FOREIGN KEY (customer_id)
-        REFERENCES Customer(customer_id),
-    FOREIGN KEY (employee_responsable)
-        REFERENCES Employee(employee_ssn),
+    FOREIGN KEY (hotel_id, room_number) REFERENCES Room (hotel_id, room_number),
+    FOREIGN KEY (customer_id) REFERENCES Customer (customer_id),
+    FOREIGN KEY (employee_responsable) REFERENCES Employee (employee_ssn),
     Check (checkin_date < checkout_date),
     CHECK (
-    (booking = TRUE AND booking_date IS NOT NULL)
-    OR (booking = FALSE)),
+        (
+            booking = TRUE
+            AND booking_date IS NOT NULL
+        )
+        OR (booking = FALSE)
+    ),
     UNIQUE (
         hotel_id,
         room_number,
@@ -333,13 +347,21 @@ create table if not exists archived_renting_booking (
     checkout_date date not null,
     booking_date date,
     booking boolean not null,
-    customer_id INTEGER not null check (customer_id between 100000000 and 999999999),
-	employee_responsable integer not null  CHECK (employee_responsable between 100000000 and 999999999),
-    check(checkin_date < checkout_date),
+    customer_id INTEGER not null check (
+        customer_id between 100000000 and 999999999
+    ),
+    employee_responsable integer not null CHECK (
+        employee_responsable between 100000000 and 999999999
+    ),
+    check (checkin_date < checkout_date),
     CHECK (
-    (booking = TRUE AND booking_date IS NOT NULL)
-    OR (booking = FALSE)),
-      UNIQUE (
+        (
+            booking = TRUE
+            AND booking_date IS NOT NULL
+        )
+        OR (booking = FALSE)
+    ),
+    UNIQUE (
         hotel_id,
         room_number,
         checkin_date,
@@ -350,5 +372,3 @@ create table if not exists archived_renting_booking (
         customer_id
     )
 );
-
-

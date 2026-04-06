@@ -1,9 +1,12 @@
 package com.example.dao;
 
-import com.example.model.Room;
-
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.model.Room;
 
 public class ViewDAO {
 
@@ -11,21 +14,36 @@ public class ViewDAO {
 
         List<Room> rooms = new ArrayList<>();
 
-        Room r1 = new Room();
-        r1.setArea("Toronto");
-        r1.setCapacity(12);
+        String sql =
+            "SELECT r.* FROM room r " +
+            "JOIN hotel h ON r.hotel_id = h.hotel_id " +
+            "WHERE NOT EXISTS (" +
+            "  SELECT 1 FROM renting_booking rb" +
+            "  WHERE rb.hotel_id    = r.hotel_id" +
+            "    AND rb.room_number = r.room_number" +
+            "    AND rb.checkin_date  <= CURRENT_DATE" +
+            "    AND rb.checkout_date >  CURRENT_DATE" +
+            ")";
 
-        Room r2 = new Room();
-        r2.setArea("Ottawa");
-        r2.setCapacity(8);
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-        Room r3 = new Room();
-        r3.setArea("Montreal");
-        r3.setCapacity(15);
+            while (rs.next()) {
+                Room r = new Room();
+                r.setHotelId(rs.getInt("hotel_id"));
+                r.setRoomNumber(rs.getInt("room_number"));
+                r.setPrice(rs.getDouble("price"));
+                r.setCapacity(rs.getInt("capacity"));
+                r.setViewType(rs.getString("view_type"));
+                r.setExtendable(rs.getBoolean("extendable"));
+                r.setDamages(rs.getBoolean("damages"));
+                rooms.add(r);
+            }
 
-        rooms.add(r1);
-        rooms.add(r2);
-        rooms.add(r3);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return rooms;
     }

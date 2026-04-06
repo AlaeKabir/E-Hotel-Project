@@ -2,51 +2,34 @@ package com.example.model;
 
 public class Room {
 
-    private int id;
     private int hotelId;
+    private int roomNumber;
     private double price;
     private int capacity;
-    private String area;
+    private String viewType;
+    private boolean extendable;
+    private boolean damages;
 
     public Room() {}
 
-    public int getId() {
-        return id;
-    }
+    public int getHotelId() { return hotelId; }
+    public void setHotelId(int hotelId) { this.hotelId = hotelId; }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public int getRoomNumber() { return roomNumber; }
+    public void setRoomNumber(int roomNumber) { this.roomNumber = roomNumber; }
 
-    public int getHotelId() {
-        return hotelId;
-    }
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
 
-    public void setHotelId(int hotelId) {
-        this.hotelId = hotelId;
-    }
+    public int getCapacity() { return capacity; }
+    public void setCapacity(int capacity) { this.capacity = capacity; }
 
-    public double getPrice() {
-        return price;
-    }
+    public String getViewType() { return viewType; }
+    public void setViewType(String viewType) { this.viewType = viewType; }
 
-    public void setPrice(double price) {
-        this.price = price;
-    }
+    public boolean isExtendable() { return extendable; }
+    public void setExtendable(boolean extendable) { this.extendable = extendable; }
 
-    public int getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
-    }
-
-    public String getArea() {
-        return area;
-    }
-
-    public void setArea(String area) {
-        this.area = area;
-    }
+    public boolean isDamages() { return damages; }
+    public void setDamages(boolean damages) { this.damages = damages; }
 }

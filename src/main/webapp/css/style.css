@@ -84,3 +84,16 @@ body {
     color: #3a4c5d;
     font-weight: 500;
 }
+
+.city-banner { 
+    background: #e8f4fd; 
+    border: 1px solid #bee3f8; 
+    border-radius: 8px;          
+    padding: 12px 18px; 
+    margin-bottom: 16px; 
+    color: #3a505d;
+}
+
+.badge-primary { background: var(--primary-color); color: #3a505d; border: none;
+                           font-size: 0.7rem; padding: 2px 7px; border-radius: 20px;
+                           vertical-align: middle; margin-left: 6px; }

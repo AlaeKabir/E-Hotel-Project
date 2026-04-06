@@ -1,6 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Set" %>
 <%@ page import="com.example.model.Room" %>
+<%
+    List<Room> rooms        = (List<Room>) request.getAttribute("rooms");
+    Set<String> mostExp     = (Set<String>) request.getAttribute("mostExpensive");
+    Integer cityAvailable   = (Integer) request.getAttribute("cityAvailable");
+    String cityName         = (String)  request.getAttribute("cityName");
+    if (mostExp == null) mostExp = new java.util.HashSet<>();
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -25,7 +33,6 @@
         <div class="filter-section">
             <form action="${pageContext.request.contextPath}/searchRooms" method="get" class="row g-3">
 
-                <%-- Dates --%>
                 <div class="col-md-3">
                     <label class="form-label fw-bold">Check-in Date</label>
                     <input type="date" name="startDate" class="form-control"
@@ -37,21 +44,18 @@
                            value="${param.endDate}" min="<%= java.time.LocalDate.now().plusDays(1) %>">
                 </div>
 
-                <%-- Area --%>
                 <div class="col-md-3">
                     <label class="form-label fw-bold">City / Area</label>
                     <input type="text" name="city" class="form-control"
                            value="${param.city}" placeholder="e.g. Ottawa">
                 </div>
 
-                <%-- Chain --%>
                 <div class="col-md-3">
                     <label class="form-label fw-bold">Hotel Chain</label>
                     <input type="text" name="chain" class="form-control"
                            value="${param.chain}" placeholder="e.g. Star Hotels">
                 </div>
 
-                <%-- Star Rating (category) --%>
                 <div class="col-md-2">
                     <label class="form-label fw-bold">Category (Stars)</label>
                     <select name="starRating" class="form-select">
@@ -64,21 +68,18 @@
                     </select>
                 </div>
 
-                <%-- Capacity --%>
                 <div class="col-md-2">
                     <label class="form-label fw-bold">Min Capacity</label>
                     <input type="number" name="capacity" class="form-control"
                            value="${param.capacity}" min="1" max="5" placeholder="1-5">
                 </div>
 
-                <%-- Price --%>
                 <div class="col-md-2">
                     <label class="form-label fw-bold">Max Price ($/night)</label>
                     <input type="number" name="price" class="form-control"
                            value="${param.price}" min="0" placeholder="e.g. 300">
                 </div>
 
-                <%-- View Type --%>
                 <div class="col-md-2">
                     <label class="form-label fw-bold">View Type</label>
                     <select name="viewType" class="form-select">
@@ -88,14 +89,12 @@
                     </select>
                 </div>
 
-                <%-- Total Rooms in Hotel --%>
                 <div class="col-md-2">
                     <label class="form-label fw-bold">Min Rooms in Hotel</label>
                     <input type="number" name="minHotelRooms" class="form-control"
                            value="${param.minHotelRooms}" min="1" placeholder="e.g. 5">
                 </div>
 
-                <%-- Extendable --%>
                 <div class="col-md-2 d-flex align-items-end">
                     <div class="form-check mb-2">
                         <input class="form-check-input" type="checkbox" name="extendable"
@@ -106,37 +105,61 @@
 
                 <div class="col-12 d-flex gap-2">
                     <button type="submit" class="btn btn-primary px-5">Search</button>
-                    <a href="${pageContext.request.contextPath}/searchRooms" class="btn btn-outline-secondary">Clear</a>
+                    <a href="${pageContext.request.contextPath}/searchRooms"
+                       class="btn btn-outline-secondary">Clear</a>
                 </div>
 
             </form>
         </div>
 
+        <%-- CITY AVAILABILITY BANNER --%>
+        <% if (cityAvailable != null) { %>
+        <div class="city-banner">
+            <strong><%= cityName %></strong> has
+            <strong><%= cityAvailable %></strong>
+            available room<%= cityAvailable != 1 ? "s" : "" %>
+            <% if (request.getParameter("startDate") != null && !request.getParameter("startDate").isEmpty()) { %>
+                from <strong>${param.startDate}</strong> to <strong>${param.endDate}</strong>
+            <% } %>
+        </div>
+        <% } %>
+
         <%-- RESULTS --%>
-        <%
-            List<Room> rooms = (List<Room>) request.getAttribute("rooms");
-            if (rooms != null) {
-        %>
+        <% if (rooms != null) { %>
             <h5 class="mb-3">
                 <%= rooms.size() %> room<%= rooms.size() != 1 ? "s" : "" %> found
             </h5>
 
             <% if (rooms.isEmpty()) { %>
-                <div class="alert alert-info">No rooms match your search criteria. Try adjusting your filters.</div>
+                <div class="alert alert-info">
+                    No rooms match your search criteria. Try adjusting your filters.
+                </div>
             <% } else { %>
                 <div class="row">
-                <% for (Room r : rooms) { %>
+                <% for (Room r : rooms) {
+                       boolean isTopPrice = mostExp.contains(r.getHotelId() + "-" + r.getRoomNumber());
+                %>
                     <div class="col-md-6">
                         <div class="room-card">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
-                                    <h6 class="mb-1"><%= r.getHotelName() %> — Room <%= r.getRoomNumber() %></h6>
+                                    <h6 class="mb-1">
+                                        <%= r.getHotelName() %> — Room <%= r.getRoomNumber() %>
+                                    </h6>
                                     <small class="text-muted"><%= r.getViewType() %> view</small>
                                 </div>
-                                <span class="fs-5 fw-bold text-primary">$<%= String.format("%.2f", r.getPrice()) %>/night</span>
+                                <div class="text-end">
+                                    <span class="fs-5 fw-bold text-primary">
+                                        $<%= String.format("%.2f", r.getPrice()) %>/night
+                                    </span>
+                                    <% if (isTopPrice) { %>
+                                        <br>
+                                        <span class="badge-primary">$$ Most Expensive in Hotel</span>
+                                    <% } %>
+                                </div>
                             </div>
                             <hr class="my-2">
-                            <div class="row text-sm">
+                            <div class="row">
                                 <div class="col-6">
                                     <small>Capacity: <strong><%= r.getCapacity() %></strong></small>
                                 </div>
@@ -151,7 +174,7 @@
                                 <a href="${pageContext.request.contextPath}/bookRoom?hotelId=<%= r.getHotelId() %>&roomNumber=<%= r.getRoomNumber() %>&startDate=${param.startDate}&endDate=${param.endDate}&type=booking"
                                    class="btn btn-primary btn-sm flex-fill">Book</a>
                                 <a href="${pageContext.request.contextPath}/bookRoom?hotelId=<%= r.getHotelId() %>&roomNumber=<%= r.getRoomNumber() %>&startDate=${param.startDate}&endDate=${param.endDate}&type=renting"
-                                   class="btn btn-primary btn-sm flex-fill">Rent</a>
+                                   class="btn btn-outline-primary btn-sm flex-fill">Rent</a>
                             </div>
                         </div>
                     </div>
@@ -166,7 +189,6 @@
 
 </div>
 
-<%-- Auto-submit form when any filter changes --%>
 <script>
     document.querySelectorAll('select').forEach(sel => {
         sel.addEventListener('change', () => sel.closest('form').submit());

@@ -24,7 +24,7 @@ public class BookingServlet extends HttpServlet {
         request.setAttribute("roomNumber", request.getParameter("roomNumber"));
         request.setAttribute("startDate",  request.getParameter("startDate"));
         request.setAttribute("endDate",    request.getParameter("endDate"));
-        request.setAttribute("type",       request.getParameter("type")); 
+        request.setAttribute("type",       request.getParameter("type"));
 
         request.getRequestDispatcher("/customer/booking.jsp").forward(request, response);
     }
@@ -32,25 +32,26 @@ public class BookingServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        try {
-            int hotelId      = Integer.parseInt(request.getParameter("hotelId"));
-            int roomNumber   = Integer.parseInt(request.getParameter("roomNumber"));
-            int customerId   = Integer.parseInt(request.getParameter("customerId"));
-            String startDate = request.getParameter("startDate");
-            String endDate   = request.getParameter("endDate");
-            String type      = request.getParameter("type"); //"booking" or "renting"
-            boolean isBooking = "booking".equals(type);
-            
-            //I DONT LIKE THIS AND WILL CHANGE
+        String type      = request.getParameter("type");
+        String startDate = request.getParameter("startDate");
+        String endDate   = request.getParameter("endDate");
+        String hotelIdStr    = request.getParameter("hotelId");
+        String roomNumberStr = request.getParameter("roomNumber");
 
-            //Employee 100000001 as default — in real app would come from session
+        try {
+            int hotelId    = Integer.parseInt(hotelIdStr);
+            int roomNumber = Integer.parseInt(roomNumberStr);
+            int customerId = Integer.parseInt(request.getParameter("customerId"));
+            boolean isBooking = "booking".equals(type);
+
+            // Default employee — change to session-based later
             int employeeId = 100000001;
 
+            // Register customer if they don't exist yet
             CustomerDAO customerDAO = new CustomerDAO();
             Customer customer = customerDAO.getCustomerById(customerId);
 
             if (customer == null) {
-
                 customer = new Customer();
                 customer.setCustomerId(customerId);
                 customer.setFirstName(request.getParameter("firstName"));
@@ -74,9 +75,9 @@ public class BookingServlet extends HttpServlet {
             if (isBooking) booking.setBookingDate(LocalDate.now());
 
             BookingDAO bookingDAO = new BookingDAO();
-            boolean success = bookingDAO.insertBooking(booking);
+            String error = bookingDAO.insertBooking(booking);
 
-            if (success) {
+            if (error == null) {
                 response.sendRedirect(request.getContextPath() + "/customer/confirmation.jsp" +
                         "?type=" + type +
                         "&hotelId=" + hotelId +
@@ -84,13 +85,24 @@ public class BookingServlet extends HttpServlet {
                         "&startDate=" + startDate +
                         "&endDate=" + endDate);
             } else {
-                request.setAttribute("error", "Booking failed. The room may no longer be available.");
+                // Re-populate attributes so the form keeps its values
+                request.setAttribute("hotelId",    hotelIdStr);
+                request.setAttribute("roomNumber",  roomNumberStr);
+                request.setAttribute("startDate",   startDate);
+                request.setAttribute("endDate",     endDate);
+                request.setAttribute("type",        type);
+                request.setAttribute("error",       error);
                 request.getRequestDispatcher("/customer/booking.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "An error occurred: " + e.getMessage());
+            request.setAttribute("hotelId",   hotelIdStr);
+            request.setAttribute("roomNumber", roomNumberStr);
+            request.setAttribute("startDate",  startDate);
+            request.setAttribute("endDate",    endDate);
+            request.setAttribute("type",       type);
+            request.setAttribute("error", "An unexpected error occurred: " + e.getMessage());
             request.getRequestDispatcher("/customer/booking.jsp").forward(request, response);
         }
     }

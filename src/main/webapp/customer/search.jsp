@@ -36,7 +36,7 @@
                 <div class="col-md-3">
                     <label class="form-label fw-bold">Check-in Date</label>
                     <input type="date" name="startDate" class="form-control"
-                           value="${param.startDate}" min="<%= java.time.LocalDate.now() %>">
+                           value="${param.startDate}">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-bold">Check-out Date</label>

@@ -12,7 +12,7 @@ import com.example.model.Booking;
 
 public class BookingDAO {
 
-    public boolean insertBooking(Booking b) {
+    public String insertBooking(Booking b) {
         String sql = "INSERT INTO renting_booking " +
                      "(hotel_id, room_number, customer_id, renting_booking_id, " +
                      " checkin_date, checkout_date, employee_responsable, booking, booking_date) " +
@@ -30,18 +30,26 @@ public class BookingDAO {
             ps.setInt(7, b.getEmployeeResponsable());
             ps.setBoolean(8, b.isBooking());
 
-            // booking_date only set if it's a booking, null for renting
             if (b.isBooking()) {
                 ps.setDate(9, Date.valueOf(LocalDate.now()));
             } else {
                 ps.setNull(9, Types.DATE);
             }
 
-            return ps.executeUpdate() == 1;
+            ps.executeUpdate();
+            return null; 
+        } catch (SQLException e) {
+            String msg = e.getMessage();
 
-        } catch (Exception e) {
+            if (msg != null && msg.contains("checkin_date") && msg.contains("cannot be before today")) {
+                return "Check-in date cannot be in the past. Please select a future date.";
+            }
+            if (msg != null && msg.contains("already has a renting during the selected date range")) {
+                return "This room is already booked for the selected dates. Please choose different dates.";
+            }
+
             e.printStackTrace();
-            return false;
+            return "Booking failed due to an unexpected error. Please try again.";
         }
     }
 
@@ -53,7 +61,6 @@ public class BookingDAO {
         }
     }
 
-    // Fetch bookings for a customer (for 2c nested query UI)
     public java.util.List<Booking> getBookingsByCustomer(int customerId) {
         java.util.List<Booking> list = new java.util.ArrayList<>();
         String sql = "SELECT * FROM renting_booking WHERE customer_id = ? ORDER BY checkin_date DESC";

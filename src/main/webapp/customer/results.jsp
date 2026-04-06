@@ -1,4 +1,8 @@
+<%@ page import="java.util.List" %>
 <%@ page import="java.util.*, com.example.model.Room" %>
+<%
+    List<Room> rooms = (List<Room>) request.getAttribute("rooms");
+%>
 <!DOCTYPE html>
 <html>
 <head>

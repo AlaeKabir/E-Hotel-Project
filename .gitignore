@@ -2,3 +2,7 @@ package-lock.json
 node_modules/
 .idea/
 .smarttomcat/
+.vscode/
+src/main/java/target/
+target/
+webapp/

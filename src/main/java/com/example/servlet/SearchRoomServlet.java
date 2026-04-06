@@ -27,10 +27,13 @@ public class SearchRoomServlet extends HttpServlet {
         int starRating = parseInt(request.getParameter("starRating"));
         int capacity   = parseInt(request.getParameter("capacity"));
         double price   = parseDouble(request.getParameter("price"));
+        String extendable     = request.getParameter("extendable");
+        int minHotelRooms     = parseInt(request.getParameter("minHotelRooms"));
 
         RoomDAO dao = new RoomDAO();
-        List<Room> rooms = dao.searchRooms(city, chain, starRating, capacity, price, viewType, startDate, endDate);
-
+        List<Room> rooms = dao.searchRooms(city, chain, starRating, capacity, price, 
+                                   viewType, startDate, endDate, 
+                                   minHotelRooms, extendable);
         request.setAttribute("rooms", rooms);
         request.getRequestDispatcher("/customer/search.jsp").forward(request, response);
     }

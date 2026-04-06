@@ -12,7 +12,7 @@ public class RoomDAO {
 
     public List<Room> searchRooms(String city, String chain, int starRating,
                                int capacity, double price,
-                               String viewType, String startDate, String endDate) {
+                               String viewType, String startDate, String endDate, int minHotelRooms, String extendable) {
 
     List<Room> rooms = new ArrayList<>();
 
@@ -69,7 +69,16 @@ public class RoomDAO {
             params.add(endDate);
             params.add(startDate);
         }
+        
+        if (minHotelRooms > 0) {
+            sql += " AND h.num_of_rooms >= ?";
+            params.add(minHotelRooms);
+        }
 
+        if (extendable != null && extendable.equals("true")) {
+            sql += " AND r.extendable = TRUE";
+        }
+        
         PreparedStatement ps = conn.prepareStatement(sql);
         for (int i = 0; i < params.size(); i++) {
             ps.setObject(i + 1, params.get(i));

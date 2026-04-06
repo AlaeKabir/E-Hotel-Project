@@ -1,5 +1,5 @@
 :root {
-    --primary-color: #61bdfb;
+    --primary-color: #c1e8ff;
     --background-color: #eef6ff;
     --dark-bg: #1f2a33;
     --text-color: #1c2b39;
@@ -36,10 +36,11 @@ body {
 .btn-primary {
     background-color: var(--primary-color);
     border: none;
+    color: #3a505d;
 }
 
 .btn-primary:hover {
-    background-color: #4aa8e0;
+    background-color: rgb(105, 220, 255);
 }
 
 /* Navbar */

@@ -7,47 +7,54 @@
     <title>Search Rooms</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <style>
+        .room-card { border: 1px solid #dee2e6; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+        .filter-section { background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    </style>
 </head>
-
 <body>
 <div class="wrapper">
 
     <jsp:include page="/components/navbar.jsp" />
 
-    <div class="container mt-5" style="flex:1;">
-        <div class="card-custom">
+    <div class="container mt-4" style="flex:1;">
 
-            <h3>Search Rooms</h3>
+        <h3 class="mb-4">Search Available Rooms</h3>
 
-            <form action="/searchRooms" method="get" class="row g-3">
+        <%-- FILTER FORM --%>
+        <div class="filter-section">
+            <form action="${pageContext.request.contextPath}/searchRooms" method="get" class="row g-3">
 
-                <div class="col-md-6">
-                    <label>Start Date</label>
+                <%-- Dates --%>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Check-in Date</label>
                     <input type="date" name="startDate" class="form-control"
-                           value="${param.startDate}">
+                           value="${param.startDate}" min="<%= java.time.LocalDate.now() %>">
                 </div>
-
-                <div class="col-md-6">
-                    <label>End Date</label>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Check-out Date</label>
                     <input type="date" name="endDate" class="form-control"
-                           value="${param.endDate}">
+                           value="${param.endDate}" min="<%= java.time.LocalDate.now().plusDays(1) %>">
                 </div>
 
-                <div class="col-md-4">
-                    <label>City</label>
+                <%-- Area --%>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">City / Area</label>
                     <input type="text" name="city" class="form-control"
                            value="${param.city}" placeholder="e.g. Ottawa">
                 </div>
 
-                <div class="col-md-4">
-                    <label>Hotel Chain</label>
+                <%-- Chain --%>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Hotel Chain</label>
                     <input type="text" name="chain" class="form-control"
                            value="${param.chain}" placeholder="e.g. Star Hotels">
                 </div>
 
-                <div class="col-md-4">
-                    <label>Star Rating</label>
-                    <select name="starRating" class="form-control">
+                <%-- Star Rating (category) --%>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Category (Stars)</label>
+                    <select name="starRating" class="form-select">
                         <option value="">Any</option>
                         <option value="1" ${param.starRating == '1' ? 'selected' : ''}>1 Star</option>
                         <option value="2" ${param.starRating == '2' ? 'selected' : ''}>2 Stars</option>
@@ -57,78 +64,100 @@
                     </select>
                 </div>
 
-                <div class="col-md-4">
-                    <label>Capacity</label>
+                <%-- Capacity --%>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Min Capacity</label>
                     <input type="number" name="capacity" class="form-control"
-                           value="${param.capacity}" min="1">
+                           value="${param.capacity}" min="1" max="5" placeholder="1-5">
                 </div>
 
-                <div class="col-md-4">
-                    <label>Max Price ($)</label>
+                <%-- Price --%>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Max Price ($/night)</label>
                     <input type="number" name="price" class="form-control"
-                           value="${param.price}" min="0">
+                           value="${param.price}" min="0" placeholder="e.g. 300">
                 </div>
 
-                <div class="col-md-4">
-                    <label>View Type</label>
-                    <select name="viewType" class="form-control">
+                <%-- View Type --%>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">View Type</label>
+                    <select name="viewType" class="form-select">
                         <option value="">Any</option>
                         <option value="Sea"      ${param.viewType == 'Sea'      ? 'selected' : ''}>Sea</option>
                         <option value="Mountain" ${param.viewType == 'Mountain' ? 'selected' : ''}>Mountain</option>
                     </select>
                 </div>
 
-                <div class="col-12">
-                    <button class="btn btn-primary w-100">Search</button>
+                <%-- Total Rooms in Hotel --%>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Min Rooms in Hotel</label>
+                    <input type="number" name="minHotelRooms" class="form-control"
+                           value="${param.minHotelRooms}" min="1" placeholder="e.g. 5">
+                </div>
+
+                <%-- Extendable --%>
+                <div class="col-md-2 d-flex align-items-end">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="extendable"
+                               value="true" ${param.extendable == 'true' ? 'checked' : ''}>
+                        <label class="form-check-label fw-bold">Extendable Only</label>
+                    </div>
+                </div>
+
+                <div class="col-12 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-5">Search</button>
+                    <a href="${pageContext.request.contextPath}/searchRooms" class="btn btn-outline-secondary">Clear</a>
                 </div>
 
             </form>
         </div>
 
-        <%-- Results table — only shown after a search --%>
+        <%-- RESULTS --%>
         <%
             List<Room> rooms = (List<Room>) request.getAttribute("rooms");
             if (rooms != null) {
         %>
-        <div class="card-custom mt-4">
-            <h5>Results (<%= rooms.size() %> room<%= rooms.size() != 1 ? "s" : "" %> found)</h5>
+            <h5 class="mb-3">
+                <%= rooms.size() %> room<%= rooms.size() != 1 ? "s" : "" %> found
+            </h5>
 
             <% if (rooms.isEmpty()) { %>
-                <p class="text-muted">No rooms match your search criteria.</p>
+                <div class="alert alert-info">No rooms match your search criteria. Try adjusting your filters.</div>
             <% } else { %>
-                <table class="table table-striped mt-3">
-                    <thead>
-                        <tr>
-                            <th>Hotel ID</th>
-                            <th>Room #</th>
-                            <th>Price/night</th>
-                            <th>Capacity</th>
-                            <th>View</th>
-                            <th>Extendable</th>
-                            <th>Damages</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% for (Room r : rooms) { %>
-                        <tr>
-                            <td><%= r.getHotelId() %></td>
-                            <td><%= r.getRoomNumber() %></td>
-                            <td>$<%= String.format("%.2f", r.getPrice()) %></td>
-                            <td><%= r.getCapacity() %></td>
-                            <td><%= r.getViewType() %></td>
-                            <td><%= r.isExtendable() ? "Yes" : "No" %></td>
-                            <td><%= r.isDamages()    ? "Yes" : "No" %></td>
-                            <td>
-                                <a href="/bookRoom?hotelId=<%= r.getHotelId() %>&roomNumber=<%= r.getRoomNumber() %>"
-                                   class="btn btn-sm btn-success">Book</a>
-                            </td>
-                        </tr>
-                        <% } %>
-                    </tbody>
-                </table>
+                <div class="row">
+                <% for (Room r : rooms) { %>
+                    <div class="col-md-6">
+                        <div class="room-card">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">Hotel #<%= r.getHotelId() %> — Room <%= r.getRoomNumber() %></h6>
+                                    <small class="text-muted"><%= r.getViewType() %> view</small>
+                                </div>
+                                <span class="fs-5 fw-bold text-primary">$<%= String.format("%.2f", r.getPrice()) %>/night</span>
+                            </div>
+                            <hr class="my-2">
+                            <div class="row text-sm">
+                                <div class="col-6">
+                                    <small>Capacity: <strong><%= r.getCapacity() %></strong></small>
+                                </div>
+                                <div class="col-6">
+                                    <small>Extendable: <strong><%= r.isExtendable() ? "Yes" : "No" %></strong></small>
+                                </div>
+                                <div class="col-6 mt-1">
+                                    <small>Damages: <strong><%= r.isDamages() ? "Yes" : "No" %></strong></small>
+                                </div>
+                            </div>
+                            <div class="mt-3 d-flex gap-2">
+                                <a href="${pageContext.request.contextPath}/bookRoom?hotelId=<%= r.getHotelId() %>&roomNumber=<%= r.getRoomNumber() %>&startDate=${param.startDate}&endDate=${param.endDate}&type=booking"
+                                   class="btn btn-primary btn-sm flex-fill">Book</a>
+                                <a href="${pageContext.request.contextPath}/bookRoom?hotelId=<%= r.getHotelId() %>&roomNumber=<%= r.getRoomNumber() %>&startDate=${param.startDate}&endDate=${param.endDate}&type=renting"
+                                   class="btn btn-primary btn-sm flex-fill">Rent</a>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+                </div>
             <% } %>
-        </div>
         <% } %>
 
     </div>
@@ -136,5 +165,13 @@
     <jsp:include page="/components/footer.jsp" />
 
 </div>
+
+<%-- Auto-submit form when any filter changes --%>
+<script>
+    document.querySelectorAll('select').forEach(sel => {
+        sel.addEventListener('change', () => sel.closest('form').submit());
+    });
+</script>
+
 </body>
 </html>

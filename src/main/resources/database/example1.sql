@@ -1,7 +1,6 @@
 UPDATE renting_booking
 SET
-    booking = FALSE,
-    booking_date = NULL
+    booking = FALSE
 WHERE
-    renting_booking_id = 1
+    renting_booking_id = 2
     AND booking = TRUE;

@@ -80,12 +80,8 @@
                 🔎 Search Rooms
             </a>
 
-            <a href="employee/dashboard.jsp" class="home-btn">
+            <a href="employee/employeeDashboard.jsp" class="home-btn">
                 👨‍💼 Employee Portal
-            </a>
-
-            <a href="admin/dashboard.jsp" class="home-btn">
-                ⚙️ Admin Portal
             </a>
 
         </div>

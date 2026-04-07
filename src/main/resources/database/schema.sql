@@ -372,3 +372,41 @@ create table if not exists archived_renting_booking (
         customer_id
     )
 );
+
+CREATE OR REPLACE VIEW available_rooms_per_area AS
+SELECT
+    h.city,
+    h.province,
+    COUNT(r.room_number) AS available_rooms
+FROM hotel h
+         JOIN room r ON h.hotel_id = r.hotel_id
+         LEFT JOIN renting_booking rb
+                   ON r.hotel_id = rb.hotel_id
+                       AND r.room_number = rb.room_number
+                       AND CURRENT_DATE BETWEEN rb.checkin_date AND rb.checkout_date
+WHERE rb.room_number IS NULL   -- room not currently rented/booked
+GROUP BY h.city, h.province;
+
+CREATE OR REPLACE VIEW hotel_total_capacity AS
+SELECT
+    h.hotel_id,
+    h.hotel_name,
+    SUM(r.capacity) AS total_capacity
+FROM hotel h
+         JOIN room r ON h.hotel_id = r.hotel_id
+GROUP BY h.hotel_id, h.hotel_name;
+
+CREATE INDEX idx_booking_room_dates
+    ON renting_booking (hotel_id, room_number, checkin_date, checkout_date);
+
+CREATE INDEX idx_room_search
+    ON room (hotel_id, capacity, price);
+
+CREATE INDEX idx_hotel_location
+    ON hotel (city, province, hotel_chain_id);
+
+CREATE INDEX idx_customer_id
+    ON customer (customer_id);
+
+CREATE INDEX idx_employee_hotel
+    ON employee (hotel_id);

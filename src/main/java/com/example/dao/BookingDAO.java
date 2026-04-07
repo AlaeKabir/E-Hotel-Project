@@ -103,4 +103,18 @@ public class BookingDAO {
         }
         return list;
     }
+
+    public void convertToRenting(int bookingId) {
+        String sql = "UPDATE renting_booking SET booking = false, booking_date = NULL WHERE renting_booking_id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, bookingId);
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

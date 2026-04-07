@@ -17,11 +17,22 @@
 
         <h3 class="mb-4">Employee Dashboard</h3>
 
+        <% if ("customerAdded".equals(request.getParameter("success"))) { %>
+            <div class="alert alert-success">
+                ✅ Customer successfully added!
+            </div>
+        <% } %>
+
         <div class="row g-3">
 
             <div class="col-md-3">
                 <a href="${pageContext.request.contextPath}/employee/search"
                    class="btn btn-primary w-100">Search Rooms</a>
+            </div>
+
+            <div class="col-md-3">
+                <a href="${pageContext.request.contextPath}/employee/addCustomer"
+                   class="btn btn-primary w-100">Add Customer</a>
             </div>
 
             <div class="col-md-3">
@@ -39,6 +50,11 @@
                         data-bs-toggle="modal" data-bs-target="#customerIdModal">
                     View Bookings
                 </button>
+            </div>
+
+            <div class="col-md-3">
+                <a href="${pageContext.request.contextPath}/employee/views"
+                   class="btn btn-outline-primary w-100">Views</a>
             </div>
 
         </div>

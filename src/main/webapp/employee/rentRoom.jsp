@@ -21,6 +21,11 @@
 
         <input type="hidden" name="type" value="renting">
 
+        <div class="mb-3">
+            <label class="form-label fw-bold">Payment Amount ($)</label>
+            <input type="number" name="payment" step="0.01" class="form-control" required>
+        </div>
+
         <div class="col-md-4">
             <label class="form-label">Customer ID</label>
             <input type="number" name="customerId" class="form-control" required>

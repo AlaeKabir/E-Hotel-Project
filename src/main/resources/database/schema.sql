@@ -384,7 +384,7 @@ FROM hotel h
                    ON r.hotel_id = rb.hotel_id
                        AND r.room_number = rb.room_number
                        AND CURRENT_DATE BETWEEN rb.checkin_date AND rb.checkout_date
-WHERE rb.room_number IS NULL   -- room not currently rented/booked
+WHERE rb.room_number IS NULL 
 GROUP BY h.city, h.province;
 
 CREATE OR REPLACE VIEW hotel_total_capacity AS

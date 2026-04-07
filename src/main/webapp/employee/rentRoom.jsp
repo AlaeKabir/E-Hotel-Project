@@ -17,16 +17,25 @@
 
     <h3>Rent Room</h3>
 
-    <form action="${pageContext.request.contextPath}/bookRoom" method="post" class="row g-3">
+    <% String msg = request.getParameter("msg"); %>
+    <% if ("success".equals(msg)) { %>
+        <div class="alert alert-success">✔ Room rented successfully</div>
+    <% } %>
+
+    <% if ("error".equals(msg)) { %>
+        <div class="alert alert-danger">❌ Failed to rent room</div>
+    <% } %>
+
+    <form action="${pageContext.request.contextPath}/employee/rentRoom" method="post" class="row g-3">
 
         <input type="hidden" name="type" value="renting">
 
-        <div class="mb-3">
-            <label class="form-label fw-bold">Payment Amount ($)</label>
-            <input type="number" name="payment" step="0.01" class="form-control" required>
+        <div class="col-md-5">
+            <label class="form-label">Employee ID</label>
+            <input type="number" name="employeeId" class="form-control" required>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-5">
             <label class="form-label">Customer ID</label>
             <input type="number" name="customerId" class="form-control" required>
         </div>
@@ -41,18 +50,23 @@
             <input type="number" name="roomNumber" class="form-control" required>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Check-in</label>
-            <input type="date" name="startDate" class="form-control" required>
+        <div class="mb-3">
+            <label>Check-in Date</label>
+            <input type="date" name="checkin" class="form-control" required>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Check-out</label>
-            <input type="date" name="endDate" class="form-control" required>
+        <div class="mb-3">
+            <label>Check-out Date</label>
+            <input type="date" name="checkout" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Payment</label>
+            <input type="number" name="payment" step="0.01" class="form-control" required>
         </div>
 
         <div class="col-12">
-            <button class="btn btn-primary">Confirm Renting</button>
+            <button class="btn btn-primary">Rent Room</button>
         </div>
 
     </form>

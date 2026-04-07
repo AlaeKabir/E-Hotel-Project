@@ -47,11 +47,7 @@ public class BookingDAO {
             ps.setInt(7, b.getEmployeeResponsable());
             ps.setBoolean(8, b.isBooking());
 
-            if (b.isBooking()) {
-                ps.setDate(9, Date.valueOf(LocalDate.now()));
-            } else {
-                ps.setNull(9, Types.DATE);
-            }
+            ps.setDate(9, Date.valueOf(LocalDate.now()));
 
             ps.executeUpdate();
             return null; 
@@ -102,19 +98,5 @@ public class BookingDAO {
             e.printStackTrace();
         }
         return list;
-    }
-
-    public void convertToRenting(int bookingId) {
-        String sql = "UPDATE renting_booking SET booking = false, booking_date = NULL WHERE renting_booking_id = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, bookingId);
-            ps.executeUpdate();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

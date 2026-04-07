@@ -12,6 +12,23 @@ import com.example.model.Booking;
 
 public class BookingDAO {
 
+    public String convertToRenting(int rentingBookingId) {
+        String sql = "UPDATE renting_booking " +
+                    "SET booking = FALSE, booking_date = NULL " +
+                    "WHERE renting_booking_id = ? AND booking = TRUE";
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, rentingBookingId);
+            int rows = ps.executeUpdate();
+            if (rows == 0) return "Booking not found or already a renting.";
+            return null; 
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "Failed to convert booking: " + e.getMessage();
+        }
+    }
+
+
     public String insertBooking(Booking b) {
         String sql = "INSERT INTO renting_booking " +
                      "(hotel_id, room_number, customer_id, renting_booking_id, " +

@@ -18,14 +18,24 @@ import jakarta.servlet.http.HttpServletResponse;
 public class BookingServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
+
+        String customerIdParam = request.getParameter("customerId");
+
+        if (customerIdParam != null) {
+            int customerId = Integer.parseInt(customerIdParam);
+            BookingDAO bookingDAO = new BookingDAO();
+            request.setAttribute("bookings", bookingDAO.getBookingsByCustomer(customerId));
+            request.setAttribute("customerId", customerId);
+            request.getRequestDispatcher("/employee/viewBookings.jsp").forward(request, response);
+            return;
+        }
 
         request.setAttribute("hotelId",    request.getParameter("hotelId"));
         request.setAttribute("roomNumber", request.getParameter("roomNumber"));
         request.setAttribute("startDate",  request.getParameter("startDate"));
         request.setAttribute("endDate",    request.getParameter("endDate"));
         request.setAttribute("type",       request.getParameter("type"));
-
         request.getRequestDispatcher("/customer/booking.jsp").forward(request, response);
     }
 
